@@ -1,0 +1,31 @@
+# Build outputs
+build/
+dist/
+wheelhouse/
+_skbuild/
+*.egg-info/
+*.so
+*.pyd
+compile_commands.json
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.python-version
+uv.lock
+
+# Documentation site
+site/
+
+# Third-party headers fetched by scripts/fetch_boost.py
+.deps/
+
+# Secrets and local tooling
+.env
+.env.*
+.idea/
+.vscode/
+.cadence/
+skills/
+.DS_Store

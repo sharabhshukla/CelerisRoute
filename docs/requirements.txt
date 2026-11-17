@@ -1,0 +1,4 @@
+# What the documentation site is built with (see .github/workflows/docs.yml).
+mkdocs-material>=9.5
+mkdocstrings[python]>=0.26
+ruff                         # formats the signatures in the API reference

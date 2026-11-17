@@ -1,0 +1,30 @@
+/* Landing page hero */
+.cp-hero {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+}
+.cp-hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.cp-hero p.cp-tagline {
+  font-size: 1.15rem;
+  color: var(--md-default-fg-color--light);
+  max-width: 40rem;
+  margin: 0 auto 1.2rem;
+}
+
+/* Numbers in tables line up */
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keep wide benchmark tables readable */
+.md-typeset__table {
+  min-width: 100%;
+}
+.md-typeset table:not([class]) {
+  display: table;
+}

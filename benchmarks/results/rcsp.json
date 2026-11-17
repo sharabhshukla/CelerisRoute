@@ -1,0 +1,1652 @@
+{
+  "benchmark": "rcsp",
+  "config": {
+    "seed": 20240607,
+    "quick": false,
+    "cases": [
+      [
+        1000,
+        100,
+        1,
+        0.25
+      ],
+      [
+        1000,
+        100,
+        1,
+        0.75
+      ],
+      [
+        1000,
+        100,
+        2,
+        0.25
+      ],
+      [
+        1000,
+        100,
+        2,
+        0.75
+      ],
+      [
+        1000,
+        33,
+        1,
+        0.25
+      ],
+      [
+        1000,
+        33,
+        1,
+        0.75
+      ],
+      [
+        1000,
+        33,
+        2,
+        0.25
+      ],
+      [
+        1000,
+        33,
+        2,
+        0.5
+      ],
+      [
+        10000,
+        1000,
+        1,
+        0.25
+      ],
+      [
+        10000,
+        1000,
+        1,
+        0.75
+      ],
+      [
+        10000,
+        1000,
+        2,
+        0.25
+      ],
+      [
+        10000,
+        1000,
+        2,
+        0.75
+      ],
+      [
+        10000,
+        333,
+        1,
+        0.25
+      ],
+      [
+        10000,
+        333,
+        1,
+        0.75
+      ],
+      [
+        10000,
+        333,
+        2,
+        0.25
+      ],
+      [
+        100000,
+        10000,
+        1,
+        0.25
+      ],
+      [
+        100000,
+        10000,
+        1,
+        0.75
+      ],
+      [
+        100000,
+        10000,
+        2,
+        0.25
+      ],
+      [
+        100000,
+        10000,
+        2,
+        0.75
+      ]
+    ],
+    "out_degree": 4,
+    "cost_range": [
+      -5,
+      20
+    ],
+    "resource_range": [
+      1,
+      10
+    ],
+    "algorithm": "rcsp",
+    "dominance_tolerance": 0.0,
+    "timing": "wall clock; solve = median of repeated network.solve calls after one warm-up"
+  },
+  "environment": {
+    "timestamp_utc": "2026-11-16T17:48:20+00:00",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "processor": "Apple M4",
+    "cpu_count": 10,
+    "python": "3.14.0 free-threading build (main, Nov 19 2025, 23:27:50) [Clang 21.1.4 ]",
+    "gil_enabled": false,
+    "numpy": "2.5.5",
+    "scipy": "1.18.1",
+    "celerispath": "0.1.0"
+  },
+  "results": [
+    {
+      "num_vertices": 1002,
+      "num_edges": 3800,
+      "num_layers": 10,
+      "layer_width": 100,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        33.0
+      ],
+      "status": "optimal",
+      "cost": 79.0,
+      "unconstrained_cost": -33.0,
+      "resources_used": {
+        "r0": 32.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 23509,
+      "labels_extended": 8160,
+      "labels_dominated": 15349,
+      "labels_infeasible": 5721,
+      "max_active_labels": 3931,
+      "pareto_labels_at_target": 21,
+      "build_seconds": 4.2083964217454195e-05,
+      "compile_seconds": 3.7999998312443495e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.003386208030860871,
+        "min": 0.0031608749995939434,
+        "max": 0.00399579101940617,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 0.0033798125,
+        "min": 0.003156334,
+        "max": 0.00398925,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.1124997399747372e-05,
+        "min": 1.083302777260542e-05,
+        "max": 2.400000812485814e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.003478667000308633,
+        0.003447708033490926,
+        0.003387583012226969,
+        0.003384833049494773,
+        0.0033467080211266875,
+        0.0036096659605391324,
+        0.003502083010971546,
+        0.0033255000016652048,
+        0.00399579101940617,
+        0.0035087919677607715,
+        0.0036555000115185976,
+        0.0034397909766994417,
+        0.003390875004697591,
+        0.0034127079998143017,
+        0.00329258298734203,
+        0.0032527910079807043,
+        0.0032425419776700437,
+        0.003212000010535121,
+        0.003203083004336804,
+        0.00319612497696653,
+        0.003185999987181276,
+        0.003188125032465905,
+        0.0032107500010170043,
+        0.003177125006914139,
+        0.003467292001005262,
+        0.0035729999653995037,
+        0.0032081659883260727,
+        0.003595916961785406,
+        0.0036425000289455056,
+        0.0031608749995939434
+      ],
+      "raw_solve_native_seconds": [
+        0.003471417,
+        0.003441208,
+        0.003382125,
+        0.0033775,
+        0.003341041,
+        0.00360425,
+        0.0034975,
+        0.003319625,
+        0.00398925,
+        0.003502333,
+        0.003628541,
+        0.003423125,
+        0.003384084,
+        0.003391583,
+        0.00327825,
+        0.003246416,
+        0.003232458,
+        0.003203125,
+        0.003195792,
+        0.003189959,
+        0.003180709,
+        0.003183791,
+        0.003202792,
+        0.003170542,
+        0.003462584,
+        0.003565584,
+        0.003203042,
+        0.003590875,
+        0.003637125,
+        0.003156334
+      ]
+    },
+    {
+      "num_vertices": 1002,
+      "num_edges": 3800,
+      "num_layers": 10,
+      "layer_width": 100,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        76.0
+      ],
+      "status": "optimal",
+      "cost": -11.0,
+      "unconstrained_cost": -33.0,
+      "resources_used": {
+        "r0": 72.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 60003,
+      "labels_extended": 17807,
+      "labels_dominated": 42196,
+      "labels_infeasible": 515,
+      "max_active_labels": 13463,
+      "pareto_labels_at_target": 49,
+      "build_seconds": 3.6167039070278406e-05,
+      "compile_seconds": 4.39169816672802e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.012161520542576909,
+        "min": 0.011208791984245181,
+        "max": 0.013818125007674098,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 0.0121294165,
+        "min": 0.011196625,
+        "max": 0.0137675,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.0999967344105244e-05,
+        "min": 1.0749965440481901e-05,
+        "max": 2.379197394475341e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.013069790962617844,
+        0.013133041036780924,
+        0.013818125007674098,
+        0.012659416999667883,
+        0.01225670799612999,
+        0.013089500018395483,
+        0.013137708010617644,
+        0.012710875016637146,
+        0.013706583005841821,
+        0.011518249986693263,
+        0.011966749967541546,
+        0.012157208053395152,
+        0.013762374990619719,
+        0.013210290984716266,
+        0.013518917025066912,
+        0.012069542019162327,
+        0.011224750021938235,
+        0.011208791984245181,
+        0.011440375004895031,
+        0.012132333009503782,
+        0.012293791980482638,
+        0.01243129203794524,
+        0.01169466704595834,
+        0.011605915962718427,
+        0.012094749952666461,
+        0.011832583986688405,
+        0.011968042002990842,
+        0.012165833031758666,
+        0.011249125003814697,
+        0.011689750012010336
+      ],
+      "raw_solve_native_seconds": [
+        0.013030792,
+        0.013093875,
+        0.0137675,
+        0.012605791,
+        0.012206375,
+        0.013060667,
+        0.01311975,
+        0.012696209,
+        0.01366625,
+        0.011461916,
+        0.011925416,
+        0.012127583,
+        0.013744125,
+        0.013193875,
+        0.013506166,
+        0.012042833,
+        0.011205375,
+        0.011196625,
+        0.011418417,
+        0.012113666,
+        0.012255083,
+        0.012405458,
+        0.0116645,
+        0.011569625,
+        0.012066167,
+        0.011804084,
+        0.01194025,
+        0.01213125,
+        0.011225708,
+        0.011646583
+      ]
+    },
+    {
+      "num_vertices": 1002,
+      "num_edges": 3800,
+      "num_layers": 10,
+      "layer_width": 100,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        31.0,
+        25.0
+      ],
+      "status": "optimal",
+      "cost": 112.0,
+      "unconstrained_cost": -28.0,
+      "resources_used": {
+        "r0": 28.0,
+        "r1": 25.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 728,
+      "labels_extended": 644,
+      "labels_dominated": 84,
+      "labels_infeasible": 1905,
+      "max_active_labels": 140,
+      "pareto_labels_at_target": 4,
+      "build_seconds": 3.495794953778386e-05,
+      "compile_seconds": 3.445899346843362e-05,
+      "solve_python_facing_seconds": {
+        "median": 9.158349712379277e-05,
+        "min": 8.662499021738768e-05,
+        "max": 0.00011912500485777855,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 8.8354e-05,
+        "min": 8.3417e-05,
+        "max": 0.000115042,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.1208991054445505e-05,
+        "min": 1.091696321964264e-05,
+        "max": 4.354200791567564e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.00011912500485777855,
+        0.00010295800166204572,
+        9.933300316333771e-05,
+        9.629200212657452e-05,
+        9.43340128287673e-05,
+        9.537499863654375e-05,
+        9.512499673292041e-05,
+        9.43750492297113e-05,
+        9.408302139490843e-05,
+        9.26250359043479e-05,
+        9.175000013783574e-05,
+        9.070802479982376e-05,
+        9.14169941097498e-05,
+        9.379099356010556e-05,
+        9.029096690937877e-05,
+        9.045802289620042e-05,
+        9.02500469237566e-05,
+        9.733298793435097e-05,
+        0.00010320800356566906,
+        9.479199070483446e-05,
+        9.004201274365187e-05,
+        8.854101179167628e-05,
+        8.849997539073229e-05,
+        8.662499021738768e-05,
+        8.700002217665315e-05,
+        8.720904588699341e-05,
+        8.962501306086779e-05,
+        8.779199561104178e-05,
+        8.720799814909697e-05,
+        8.68329661898315e-05
+      ],
+      "raw_solve_native_seconds": [
+        0.000115042,
+        9.9416e-05,
+        9.5708e-05,
+        9.2875e-05,
+        9.1e-05,
+        9.2041e-05,
+        9.1708e-05,
+        9.1125e-05,
+        9.0833e-05,
+        8.9375e-05,
+        8.8458e-05,
+        8.7542e-05,
+        8.825e-05,
+        9.0667e-05,
+        8.7167e-05,
+        8.7041e-05,
+        8.7125e-05,
+        9.4083e-05,
+        9.9833e-05,
+        9.1583e-05,
+        8.675e-05,
+        8.5375e-05,
+        8.5166e-05,
+        8.3417e-05,
+        8.3708e-05,
+        8.3916e-05,
+        8.6375e-05,
+        8.45e-05,
+        8.3709e-05,
+        8.35e-05
+      ]
+    },
+    {
+      "num_vertices": 1002,
+      "num_edges": 3800,
+      "num_layers": 10,
+      "layer_width": 100,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        70.0,
+        44.0
+      ],
+      "status": "optimal",
+      "cost": -7.0,
+      "unconstrained_cost": -28.0,
+      "resources_used": {
+        "r0": 70.0,
+        "r1": 42.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 110125,
+      "labels_extended": 41190,
+      "labels_dominated": 68935,
+      "labels_infeasible": 25924,
+      "max_active_labels": 24915,
+      "pareto_labels_at_target": 197,
+      "build_seconds": 3.674998879432678e-05,
+      "compile_seconds": 3.4917029552161694e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.04254281253088266,
+        "min": 0.03892887500114739,
+        "max": 0.05817812500754371,
+        "repeats": 24
+      },
+      "solve_native_seconds": {
+        "median": 0.042490666999999996,
+        "min": 0.0388965,
+        "max": 0.058133583,
+        "repeats": 24
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.1041993275284767e-05,
+        "min": 1.0750023648142815e-05,
+        "max": 2.9375019948929548e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.045928790990728885,
+        0.0416435839724727,
+        0.04544087505200878,
+        0.04391416598809883,
+        0.03964604198699817,
+        0.03892887500114739,
+        0.040918582992162555,
+        0.04026658303337172,
+        0.03995041595771909,
+        0.05817812500754371,
+        0.044420457968954,
+        0.0461085420101881,
+        0.04325874999631196,
+        0.04135737504111603,
+        0.041649250022601336,
+        0.044584833027329296,
+        0.043132209044415504,
+        0.03941070899600163,
+        0.03964808298042044,
+        0.043569166969973594,
+        0.04237800004193559,
+        0.04270762501982972,
+        0.04296141699887812,
+        0.03999904199736193
+      ],
+      "raw_solve_native_seconds": [
+        0.04589175,
+        0.041608042,
+        0.045411708,
+        0.043875,
+        0.039613666,
+        0.0388965,
+        0.040865334,
+        0.040223333,
+        0.03992075,
+        0.058133583,
+        0.044371792,
+        0.046052959,
+        0.043205709,
+        0.041301791,
+        0.04159125,
+        0.044544417,
+        0.043084208,
+        0.03937175,
+        0.039616417,
+        0.043518292,
+        0.042321959,
+        0.042659375,
+        0.042909375,
+        0.039956
+      ]
+    },
+    {
+      "num_vertices": 992,
+      "num_edges": 3894,
+      "num_layers": 30,
+      "layer_width": 33,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        89.0
+      ],
+      "status": "optimal",
+      "cost": 227.0,
+      "unconstrained_cost": -84.0,
+      "resources_used": {
+        "r0": 88.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 110126,
+      "labels_extended": 30434,
+      "labels_dominated": 79692,
+      "labels_infeasible": 7369,
+      "max_active_labels": 5699,
+      "pareto_labels_at_target": 50,
+      "build_seconds": 3.045797348022461e-05,
+      "compile_seconds": 3.466702764853835e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.02142110446584411,
+        "min": 0.02028604201041162,
+        "max": 0.025725666026119143,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 0.0213904995,
+        "min": 0.0202685,
+        "max": 0.025677584,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.2415985111147165e-05,
+        "min": 1.2166972737759352e-05,
+        "max": 2.6041001547127962e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.020578291034325957,
+        0.020569915999658406,
+        0.02183754200814292,
+        0.022267499996814877,
+        0.02167762501630932,
+        0.022461250016931444,
+        0.021349041955545545,
+        0.02125200000591576,
+        0.020960583991836756,
+        0.021708625019527972,
+        0.022016874980181456,
+        0.02043458301341161,
+        0.020365583011880517,
+        0.021108999964781106,
+        0.021205500001087785,
+        0.021085915970616043,
+        0.021493166976142675,
+        0.02041129203280434,
+        0.02028604201041162,
+        0.020933166961185634,
+        0.022067249985411763,
+        0.020915667002554983,
+        0.020997332991100848,
+        0.021828124998137355,
+        0.021865125047042966,
+        0.023651041032280773,
+        0.025725666026119143,
+        0.024189084011595696,
+        0.024610500026028603,
+        0.02403229201445356
+      ],
+      "raw_solve_native_seconds": [
+        0.020522792,
+        0.020518666,
+        0.021806,
+        0.022227958,
+        0.021623458,
+        0.0224145,
+        0.021319416,
+        0.021219834,
+        0.020928916,
+        0.021683375,
+        0.02197825,
+        0.020399292,
+        0.020341125,
+        0.021071791,
+        0.02117325,
+        0.021051416,
+        0.021461583,
+        0.020383833,
+        0.0202685,
+        0.020916375,
+        0.02202825,
+        0.020875834,
+        0.020952584,
+        0.02178725,
+        0.021828833,
+        0.023621416,
+        0.025677584,
+        0.02413975,
+        0.024573584,
+        0.024001041
+      ]
+    },
+    {
+      "num_vertices": 992,
+      "num_edges": 3894,
+      "num_layers": 30,
+      "layer_width": 33,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        194.0
+      ],
+      "status": "optimal",
+      "cost": -23.0,
+      "unconstrained_cost": -84.0,
+      "resources_used": {
+        "r0": 194.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 240918,
+      "labels_extended": 63748,
+      "labels_dominated": 177170,
+      "labels_infeasible": 1485,
+      "max_active_labels": 17037,
+      "pareto_labels_at_target": 136,
+      "build_seconds": 3.6958022974431515e-05,
+      "compile_seconds": 3.879197174683213e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.07673475000774488,
+        "min": 0.07271087501430884,
+        "max": 0.12709724996238947,
+        "repeats": 13
+      },
+      "solve_native_seconds": {
+        "median": 0.076638167,
+        "min": 0.07264975,
+        "max": 0.127027208,
+        "repeats": 13
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.289549982175231e-05,
+        "min": 1.2625008821487427e-05,
+        "max": 2.820900408551097e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.0816505000111647,
+        0.0854694580193609,
+        0.08645162498578429,
+        0.0780251250253059,
+        0.11392166698351502,
+        0.07673475000774488,
+        0.07451179198687896,
+        0.07582691701827571,
+        0.07484875002410263,
+        0.07548891700571403,
+        0.07520566700259224,
+        0.07271087501430884,
+        0.12709724996238947
+      ],
+      "raw_solve_native_seconds": [
+        0.081591667,
+        0.085405416,
+        0.086396541,
+        0.077970916,
+        0.113747417,
+        0.076638167,
+        0.0744505,
+        0.075768666,
+        0.074785375,
+        0.075430625,
+        0.075147709,
+        0.07264975,
+        0.127027208
+      ]
+    },
+    {
+      "num_vertices": 992,
+      "num_edges": 3894,
+      "num_layers": 30,
+      "layer_width": 33,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        92.0,
+        76.0
+      ],
+      "status": "optimal",
+      "cost": 305.0,
+      "unconstrained_cost": -83.0,
+      "resources_used": {
+        "r0": 92.0,
+        "r1": 76.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 141102,
+      "labels_extended": 58013,
+      "labels_dominated": 83089,
+      "labels_infeasible": 89154,
+      "max_active_labels": 9371,
+      "pareto_labels_at_target": 68,
+      "build_seconds": 4.449998959898949e-05,
+      "compile_seconds": 4.64579788967967e-05,
+      "solve_python_facing_seconds": {
+        "median": 0.07587420800700784,
+        "min": 0.0565394579898566,
+        "max": 0.16206666600191966,
+        "repeats": 11
+      },
+      "solve_native_seconds": {
+        "median": 0.07579925,
+        "min": 0.056484,
+        "max": 0.162004125,
+        "repeats": 11
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 3.404199378564954e-05,
+        "min": 3.350002225488424e-05,
+        "max": 5.4458039812743664e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.0565394579898566,
+        0.05955249996623024,
+        0.06105470797047019,
+        0.060926458972971886,
+        0.07587420800700784,
+        0.10669966699788347,
+        0.06952387496130541,
+        0.16206666600191966,
+        0.15497366699855775,
+        0.09732120798435062,
+        0.09814320801524445
+      ],
+      "raw_solve_native_seconds": [
+        0.056484,
+        0.059483834,
+        0.061002084,
+        0.060874708,
+        0.07579925,
+        0.10663425,
+        0.069462125,
+        0.162004125,
+        0.15491175,
+        0.097253542,
+        0.098066708
+      ]
+    },
+    {
+      "num_vertices": 992,
+      "num_edges": 3894,
+      "num_layers": 30,
+      "layer_width": 33,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.5,
+      "resource_upper_bounds": [
+        150.0,
+        102.0
+      ],
+      "status": "optimal",
+      "cost": 83.0,
+      "unconstrained_cost": -83.0,
+      "resources_used": {
+        "r0": 149.0,
+        "r1": 99.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 1483104,
+      "labels_extended": 441814,
+      "labels_dominated": 1041290,
+      "labels_infeasible": 189486,
+      "max_active_labels": 108026,
+      "pareto_labels_at_target": 1204,
+      "build_seconds": 7.816700963303447e-05,
+      "compile_seconds": 6.35419855825603e-05,
+      "solve_python_facing_seconds": {
+        "median": 4.296574417036027,
+        "min": 4.211417083046399,
+        "max": 4.618624416005332,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 4.296516167,
+        "min": 4.211356958,
+        "max": 4.618566083,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 1.1208001524209976e-05,
+        "min": 1.1041993275284767e-05,
+        "max": 2.4999957531690598e-05,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        4.618624416005332,
+        4.296574417036027,
+        4.211417083046399
+      ],
+      "raw_solve_native_seconds": [
+        4.618566083,
+        4.296516167,
+        4.211356958
+      ]
+    },
+    {
+      "num_vertices": 10002,
+      "num_edges": 38000,
+      "num_layers": 10,
+      "layer_width": 1000,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        33.0
+      ],
+      "status": "optimal",
+      "cost": 75.0,
+      "unconstrained_cost": -45.0,
+      "resources_used": {
+        "r0": 33.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 213930,
+      "labels_extended": 75625,
+      "labels_dominated": 138305,
+      "labels_infeasible": 58149,
+      "max_active_labels": 32571,
+      "pareto_labels_at_target": 23,
+      "build_seconds": 0.00018400000408291817,
+      "compile_seconds": 0.0002714169677346945,
+      "solve_python_facing_seconds": {
+        "median": 0.05151381250470877,
+        "min": 0.047950042004231364,
+        "max": 0.057169375009834766,
+        "repeats": 20
+      },
+      "solve_native_seconds": {
+        "median": 0.051467833500000004,
+        "min": 0.047917959,
+        "max": 0.057104625,
+        "repeats": 20
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00015458354027941823,
+        "min": 0.0001522079692222178,
+        "max": 0.0002620830200612545,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.053527291980572045,
+        0.057169375009834766,
+        0.05296287499368191,
+        0.054240250028669834,
+        0.055906041990965605,
+        0.05368075001752004,
+        0.052736957964953035,
+        0.051321125007234514,
+        0.053905249980743974,
+        0.0515178749919869,
+        0.05003512499388307,
+        0.04909825004870072,
+        0.05150975001743063,
+        0.05085854197386652,
+        0.05027099995641038,
+        0.047950042004231364,
+        0.04987445898586884,
+        0.049512459023389965,
+        0.05166820902377367,
+        0.049029790970962495
+      ],
+      "raw_solve_native_seconds": [
+        0.053466458,
+        0.057104625,
+        0.05291925,
+        0.05420325,
+        0.055858583,
+        0.053636125,
+        0.052684542,
+        0.051263833,
+        0.053854958,
+        0.051467,
+        0.049983167,
+        0.049049625,
+        0.051468667,
+        0.050830292,
+        0.050227916,
+        0.047917959,
+        0.049838917,
+        0.049474125,
+        0.051628625,
+        0.048997
+      ]
+    },
+    {
+      "num_vertices": 10002,
+      "num_edges": 38000,
+      "num_layers": 10,
+      "layer_width": 1000,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        79.0
+      ],
+      "status": "optimal",
+      "cost": -24.0,
+      "unconstrained_cost": -45.0,
+      "resources_used": {
+        "r0": 76.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 577541,
+      "labels_extended": 171465,
+      "labels_dominated": 406076,
+      "labels_infeasible": 2828,
+      "max_active_labels": 127805,
+      "pareto_labels_at_target": 57,
+      "build_seconds": 0.00018745899433270097,
+      "compile_seconds": 0.0002620000159367919,
+      "solve_python_facing_seconds": {
+        "median": 0.24202379200141877,
+        "min": 0.23982837499352172,
+        "max": 0.24656683299690485,
+        "repeats": 5
+      },
+      "solve_native_seconds": {
+        "median": 0.241969292,
+        "min": 0.239778042,
+        "max": 0.24652025,
+        "repeats": 5
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00014860398368909955,
+        "min": 0.0001466670073568821,
+        "max": 0.00027520902222022414,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.24202379200141877,
+        0.24002987501444295,
+        0.24656683299690485,
+        0.23982837499352172,
+        0.243555249995552
+      ],
+      "raw_solve_native_seconds": [
+        0.241969292,
+        0.239978583,
+        0.24652025,
+        0.239778042,
+        0.243504709
+      ]
+    },
+    {
+      "num_vertices": 10002,
+      "num_edges": 38000,
+      "num_layers": 10,
+      "layer_width": 1000,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        32.0,
+        27.0
+      ],
+      "status": "optimal",
+      "cost": 104.0,
+      "unconstrained_cost": -45.0,
+      "resources_used": {
+        "r0": 32.0,
+        "r1": 26.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 15958,
+      "labels_extended": 13396,
+      "labels_dominated": 2562,
+      "labels_infeasible": 37545,
+      "max_active_labels": 2641,
+      "pareto_labels_at_target": 31,
+      "build_seconds": 0.00020295800641179085,
+      "compile_seconds": 0.0002938340185210109,
+      "solve_python_facing_seconds": {
+        "median": 0.0028392919921316206,
+        "min": 0.002806540986057371,
+        "max": 0.0032058340148068964,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 0.0028358335,
+        "min": 0.002802875,
+        "max": 0.003192208,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.0001417709863744676,
+        "min": 0.0001396660227328539,
+        "max": 0.00026004097890108824,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.0030462919967249036,
+        0.0032058340148068964,
+        0.0030370420427061617,
+        0.0029265839839354157,
+        0.0028507080278359354,
+        0.002855708997230977,
+        0.0028517500031739473,
+        0.002854167018085718,
+        0.0029208330088295043,
+        0.0028346659964881837,
+        0.0028144170064479113,
+        0.002836667001247406,
+        0.0028395840199664235,
+        0.0028143750387243927,
+        0.0028389999642968178,
+        0.0028272499912418425,
+        0.002806540986057371,
+        0.002875250007491559,
+        0.0028292500064708292,
+        0.002852916019037366,
+        0.002811625017784536,
+        0.0028481250046752393,
+        0.002827332995366305,
+        0.0028105409583076835,
+        0.0028316670213826,
+        0.002838957996573299,
+        0.002833249978721142,
+        0.002822041977196932,
+        0.002842582995072007,
+        0.0028429580270312726
+      ],
+      "raw_solve_native_seconds": [
+        0.003041459,
+        0.003192208,
+        0.003029166,
+        0.002922,
+        0.00284675,
+        0.002851792,
+        0.002848416,
+        0.002850667,
+        0.002916833,
+        0.002830958,
+        0.00281125,
+        0.002833333,
+        0.002835958,
+        0.002810833,
+        0.002835709,
+        0.002823916,
+        0.002802875,
+        0.002871791,
+        0.002825959,
+        0.002849208,
+        0.002808125,
+        0.002844792,
+        0.002823958,
+        0.002807292,
+        0.002827917,
+        0.002835708,
+        0.002829542,
+        0.002818875,
+        0.002839375,
+        0.002839583
+      ]
+    },
+    {
+      "num_vertices": 10002,
+      "num_edges": 38000,
+      "num_layers": 10,
+      "layer_width": 1000,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        75.0,
+        51.0
+      ],
+      "status": "optimal",
+      "cost": -18.0,
+      "unconstrained_cost": -45.0,
+      "resources_used": {
+        "r0": 75.0,
+        "r1": 50.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 1602906,
+      "labels_extended": 553783,
+      "labels_dominated": 1049123,
+      "labels_infeasible": 193132,
+      "max_active_labels": 402332,
+      "pareto_labels_at_target": 373,
+      "build_seconds": 0.0002045410219579935,
+      "compile_seconds": 0.0003112500417046249,
+      "solve_python_facing_seconds": {
+        "median": 1.4464984579826705,
+        "min": 1.4419583749840967,
+        "max": 1.529192750051152,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 1.446436917,
+        "min": 1.4418975,
+        "max": 1.529123666,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00016327050980180502,
+        "min": 0.00015949999215081334,
+        "max": 0.0006709580193273723,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        1.529192750051152,
+        1.4464984579826705,
+        1.4419583749840967
+      ],
+      "raw_solve_native_seconds": [
+        1.529123666,
+        1.446436917,
+        1.4418975
+      ]
+    },
+    {
+      "num_vertices": 9992,
+      "num_edges": 39294,
+      "num_layers": 30,
+      "layer_width": 333,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        90.0
+      ],
+      "status": "optimal",
+      "cost": 221.0,
+      "unconstrained_cost": -92.0,
+      "resources_used": {
+        "r0": 90.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 1178961,
+      "labels_extended": 324402,
+      "labels_dominated": 854559,
+      "labels_infeasible": 76228,
+      "max_active_labels": 58282,
+      "pareto_labels_at_target": 53,
+      "build_seconds": 0.0001984999980777502,
+      "compile_seconds": 0.0002683750353753567,
+      "solve_python_facing_seconds": {
+        "median": 0.430683916027192,
+        "min": 0.4208072909968905,
+        "max": 0.44669845799217,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 0.430626,
+        "min": 0.420750542,
+        "max": 0.446639,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00015179149340838194,
+        "min": 0.00014987500617280602,
+        "max": 0.0002649580128490925,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.4208072909968905,
+        0.430683916027192,
+        0.44669845799217
+      ],
+      "raw_solve_native_seconds": [
+        0.420750542,
+        0.430626,
+        0.446639
+      ]
+    },
+    {
+      "num_vertices": 9992,
+      "num_edges": 39294,
+      "num_layers": 30,
+      "layer_width": 333,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        200.0
+      ],
+      "status": "optimal",
+      "cost": -43.0,
+      "unconstrained_cost": -92.0,
+      "resources_used": {
+        "r0": 200.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 2491532,
+      "labels_extended": 657927,
+      "labels_dominated": 1833605,
+      "labels_infeasible": 12510,
+      "max_active_labels": 178537,
+      "pareto_labels_at_target": 145,
+      "build_seconds": 0.0001942500239238143,
+      "compile_seconds": 0.00027966697234660387,
+      "solve_python_facing_seconds": {
+        "median": 1.7127756670233794,
+        "min": 1.6505432080011815,
+        "max": 1.7190889999619685,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 1.712718625,
+        "min": 1.65048175,
+        "max": 1.719029125,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00015979149611666799,
+        "min": 0.00015770900063216686,
+        "max": 0.0002707919920794666,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        1.6505432080011815,
+        1.7190889999619685,
+        1.7127756670233794
+      ],
+      "raw_solve_native_seconds": [
+        1.65048175,
+        1.719029125,
+        1.712718625
+      ]
+    },
+    {
+      "num_vertices": 9992,
+      "num_edges": 39294,
+      "num_layers": 30,
+      "layer_width": 333,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        88.0,
+        77.0
+      ],
+      "status": "optimal",
+      "cost": 282.0,
+      "unconstrained_cost": -87.0,
+      "resources_used": {
+        "r0": 88.0,
+        "r1": 76.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 1562091,
+      "labels_extended": 614229,
+      "labels_dominated": 947862,
+      "labels_infeasible": 877008,
+      "max_active_labels": 99217,
+      "pareto_labels_at_target": 108,
+      "build_seconds": 0.00022158300271257758,
+      "compile_seconds": 0.00027220899937674403,
+      "solve_python_facing_seconds": {
+        "median": 0.9889696249738336,
+        "min": 0.9709040420129895,
+        "max": 1.0190481669851579,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 0.988902167,
+        "min": 0.97084525,
+        "max": 1.018985542,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00015727049321867526,
+        "min": 0.00014950003242120147,
+        "max": 0.0003143749781884253,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.9709040420129895,
+        1.0190481669851579,
+        0.9889696249738336
+      ],
+      "raw_solve_native_seconds": [
+        0.97084525,
+        1.018985542,
+        0.988902167
+      ]
+    },
+    {
+      "num_vertices": 100002,
+      "num_edges": 380000,
+      "num_layers": 10,
+      "layer_width": 10000,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        31.0
+      ],
+      "status": "optimal",
+      "cost": 77.0,
+      "unconstrained_cost": -42.0,
+      "resources_used": {
+        "r0": 30.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 1809837,
+      "labels_extended": 663774,
+      "labels_dominated": 1146063,
+      "labels_infeasible": 586689,
+      "max_active_labels": 269860,
+      "pareto_labels_at_target": 16,
+      "build_seconds": 0.0022213750053197145,
+      "compile_seconds": 0.0032495830091647804,
+      "solve_python_facing_seconds": {
+        "median": 1.295402291987557,
+        "min": 1.2771580410189927,
+        "max": 1.403039458033163,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 1.295343125,
+        "min": 1.277099709,
+        "max": 1.402980666,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.0032718130096327513,
+        "min": 0.003235084004700184,
+        "max": 0.003493208030704409,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        1.2771580410189927,
+        1.295402291987557,
+        1.403039458033163
+      ],
+      "raw_solve_native_seconds": [
+        1.277099709,
+        1.295343125,
+        1.402980666
+      ]
+    },
+    {
+      "num_vertices": 100002,
+      "num_edges": 380000,
+      "num_layers": 10,
+      "layer_width": 10000,
+      "out_degree": 4,
+      "num_resources": 1,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        72.0
+      ],
+      "status": "optimal",
+      "cost": -23.0,
+      "unconstrained_cost": -42.0,
+      "resources_used": {
+        "r0": 72.0
+      },
+      "validated_against_numpy_dp": true,
+      "labels_created": 5643119,
+      "labels_extended": 1677995,
+      "labels_dominated": 3965124,
+      "labels_infeasible": 70002,
+      "max_active_labels": 1221907,
+      "pareto_labels_at_target": 46,
+      "build_seconds": 0.0018438749830238521,
+      "compile_seconds": 0.002814624982420355,
+      "solve_python_facing_seconds": {
+        "median": 6.763905166008044,
+        "min": 6.618303833005484,
+        "max": 6.963450875016861,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 6.763464167,
+        "min": 6.61797975,
+        "max": 6.962995625,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.0034295209916308522,
+        "min": 0.0031623340328224003,
+        "max": 0.003933291998691857,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        6.618303833005484,
+        6.963450875016861,
+        6.763905166008044
+      ],
+      "raw_solve_native_seconds": [
+        6.61797975,
+        6.962995625,
+        6.763464167
+      ]
+    },
+    {
+      "num_vertices": 100002,
+      "num_edges": 380000,
+      "num_layers": 10,
+      "layer_width": 10000,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.25,
+      "resource_upper_bounds": [
+        33.0,
+        24.0
+      ],
+      "status": "optimal",
+      "cost": 94.0,
+      "unconstrained_cost": -41.0,
+      "resources_used": {
+        "r0": 33.0,
+        "r1": 21.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 64109,
+      "labels_extended": 57425,
+      "labels_dominated": 6684,
+      "labels_infeasible": 171743,
+      "max_active_labels": 10599,
+      "pareto_labels_at_target": 32,
+      "build_seconds": 0.002139999996870756,
+      "compile_seconds": 0.0032806250383146107,
+      "solve_python_facing_seconds": {
+        "median": 0.020749728981172666,
+        "min": 0.018505999993067235,
+        "max": 0.0300594589789398,
+        "repeats": 30
+      },
+      "solve_native_seconds": {
+        "median": 0.02069725,
+        "min": 0.018466458,
+        "max": 0.02999925,
+        "repeats": 30
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.00349643750814721,
+        "min": 0.003255208022892475,
+        "max": 0.010002584022004157,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        0.020123708993196487,
+        0.019727959006559104,
+        0.018871416978072375,
+        0.020572207984514534,
+        0.020065292017534375,
+        0.019861541979480535,
+        0.01914116699481383,
+        0.018505999993067235,
+        0.020445499976631254,
+        0.020614333043340594,
+        0.021746166981756687,
+        0.02079679095186293,
+        0.02063766698120162,
+        0.022318084025755525,
+        0.020843375008553267,
+        0.021435874979943037,
+        0.021076666947919875,
+        0.02002320799510926,
+        0.02846429101191461,
+        0.0300594589789398,
+        0.02498841704800725,
+        0.027128542016725987,
+        0.02168941602576524,
+        0.0207026670104824,
+        0.021471082989592105,
+        0.02179749996867031,
+        0.019899874983821064,
+        0.020651541999541223,
+        0.0212807499920018,
+        0.022860582976136357
+      ],
+      "raw_solve_native_seconds": [
+        0.020060542,
+        0.019680583,
+        0.018818125,
+        0.020522167,
+        0.020015292,
+        0.019807209,
+        0.019101833,
+        0.018466458,
+        0.020402166,
+        0.020568042,
+        0.02170175,
+        0.020743208,
+        0.020581042,
+        0.022268875,
+        0.020797,
+        0.021381667,
+        0.021022333,
+        0.019974125,
+        0.028409375,
+        0.02999925,
+        0.024924459,
+        0.027063625,
+        0.021629208,
+        0.020651292,
+        0.021418083,
+        0.02173975,
+        0.019851375,
+        0.020594625,
+        0.021227916,
+        0.022807458
+      ]
+    },
+    {
+      "num_vertices": 100002,
+      "num_edges": 380000,
+      "num_layers": 10,
+      "layer_width": 10000,
+      "out_degree": 4,
+      "num_resources": 2,
+      "tightness": 0.75,
+      "resource_upper_bounds": [
+        78.0,
+        46.0
+      ],
+      "status": "optimal",
+      "cost": -25.0,
+      "unconstrained_cost": -41.0,
+      "resources_used": {
+        "r0": 75.0,
+        "r1": 38.0
+      },
+      "validated_against_numpy_dp": false,
+      "labels_created": 12928445,
+      "labels_extended": 4735864,
+      "labels_dominated": 8192581,
+      "labels_infeasible": 2584297,
+      "max_active_labels": 3086682,
+      "pareto_labels_at_target": 380,
+      "build_seconds": 0.0021956670098006725,
+      "compile_seconds": 0.0033172080293297768,
+      "solve_python_facing_seconds": {
+        "median": 19.543404791969806,
+        "min": 18.459639417007565,
+        "max": 20.246131666004658,
+        "repeats": 3
+      },
+      "solve_native_seconds": {
+        "median": 19.542992208,
+        "min": 18.459195375,
+        "max": 20.245765417,
+        "repeats": 3
+      },
+      "unconstrained_dag_solve_seconds": {
+        "median": 0.0033910205238498747,
+        "min": 0.0032308329828083515,
+        "max": 0.0038570830365642905,
+        "repeats": 50
+      },
+      "raw_solve_python_facing_seconds": [
+        18.459639417007565,
+        19.543404791969806,
+        20.246131666004658
+      ],
+      "raw_solve_native_seconds": [
+        18.459195375,
+        19.542992208,
+        20.245765417
+      ]
+    }
+  ]
+}

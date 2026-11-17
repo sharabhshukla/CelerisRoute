@@ -1,0 +1,120 @@
+name: Wheels
+
+# Builds the source distribution and binary wheels for every supported
+# platform, and runs the test suite against each wheel. A published GitHub
+# release additionally uploads them to PyPI through trusted publishing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cpp/**"
+      - "src/**"
+      - "CMakeLists.txt"
+      - "pyproject.toml"
+      - "scripts/fetch_boost.py"
+      - ".github/workflows/wheels.yml"
+  pull_request:
+    paths:
+      - "CMakeLists.txt"
+      - "pyproject.toml"
+      - "scripts/fetch_boost.py"
+      - ".github/workflows/wheels.yml"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: wheels-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  wheels:
+    name: Wheels / ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "Linux x86_64", os: ubuntu-latest }
+          - { name: "Linux aarch64", os: ubuntu-24.04-arm }
+          - { name: "macOS arm64", os: macos-latest }
+          - { name: "macOS x86_64", os: macos-15-intel }
+          - { name: "Windows x86_64", os: windows-latest }
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      # Only Boost headers are needed. On Linux the build runs in a container
+      # that sees the checkout as /project (see [tool.cibuildwheel.linux] in
+      # pyproject.toml); elsewhere it runs on the host and reads BOOST_ROOT.
+      - name: Cache Boost headers
+        uses: actions/cache@v6
+        with:
+          path: .deps/boost
+          key: boost-headers-${{ hashFiles('scripts/fetch_boost.py') }}
+          enableCrossOsArchive: true
+
+      - name: Fetch Boost headers
+        shell: bash
+        run: |
+          python scripts/fetch_boost.py .deps/boost
+          echo "BOOST_ROOT=${GITHUB_WORKSPACE}/.deps/boost" >> "${GITHUB_ENV}"
+
+      - uses: pypa/cibuildwheel@v4.3.5
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+          if-no-files-found: error
+
+  sdist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Build
+        run: |
+          python -m pip install build
+          python -m build --sdist
+
+      - name: List the contents
+        run: tar -tzf dist/*.tar.gz
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    if: github.event_name == 'release'
+    needs: [wheels, sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/celerispath/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1

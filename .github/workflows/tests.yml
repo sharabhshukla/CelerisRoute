@@ -1,0 +1,71 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14", "3.15"]
+        include:
+          # Free-threaded CPython.
+          - os: ubuntu-latest
+            python: "3.14t"
+          - os: macos-latest
+            python: "3.14t"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          allow-prereleases: true
+
+      # Linux builds against the distribution's Boost and oneTBB, so the oneTBB
+      # scheduler is tested there. macOS and Windows build the way the release
+      # wheels are built: pinned Boost headers, no oneTBB.
+      - name: Install Boost and oneTBB (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends libboost-dev libtbb-dev
+
+      - name: Cache Boost headers (macOS, Windows)
+        if: runner.os != 'Linux'
+        uses: actions/cache@v6
+        with:
+          path: .deps/boost
+          key: boost-headers-${{ hashFiles('scripts/fetch_boost.py') }}
+          enableCrossOsArchive: true
+
+      - name: Fetch Boost headers (macOS, Windows)
+        if: runner.os != 'Linux'
+        shell: bash
+        run: |
+          python scripts/fetch_boost.py .deps/boost
+          echo "BOOST_ROOT=${GITHUB_WORKSPACE}/.deps/boost" >> "${GITHUB_ENV}"
+
+      - name: Build and install
+        run: python -m pip install --verbose ".[dev]"
+
+      - name: Show the build
+        run: python -c "import celerispath as cp; print(cp.__version__, 'oneTBB:', cp.tbb_version())"
+
+      - name: Run the tests
+        run: python -m pytest
