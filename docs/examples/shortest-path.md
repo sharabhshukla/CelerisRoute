@@ -39,4 +39,4 @@ cycle found:   Bordeaux -> Lyon -> Zurich -> Berlin -> Lisbon -> Porto -> Madrid
 Next: the same trip with a limit on driving hours, in
 [Resource limits](resource-limits.md).
 
-[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/shortest_path.py){ .md-button }
+[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisRoute/blob/main/examples/shortest_path.py){ .md-button }

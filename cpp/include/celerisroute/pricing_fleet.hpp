@@ -26,13 +26,13 @@
 #include <string>
 #include <vector>
 
-#include "celerispath/dag_solver.hpp"
-#include "celerispath/graph.hpp"
-#include "celerispath/pricing_engine.hpp"
-#include "celerispath/rcsp_solver.hpp"
-#include "celerispath/types.hpp"
+#include "celerisroute/dag_solver.hpp"
+#include "celerisroute/graph.hpp"
+#include "celerisroute/pricing_engine.hpp"
+#include "celerisroute/rcsp_solver.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 enum class Scheduler : int {
     Threads = 0,  // std::thread workers claiming vessels from an atomic counter
@@ -264,4 +264,4 @@ private:
     std::atomic<std::uint32_t> debug_fail_{kInvalid};
 };
 
-}  // namespace celerispath
+}  // namespace celerisroute

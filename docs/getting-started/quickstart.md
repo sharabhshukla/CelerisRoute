@@ -8,10 +8,10 @@ Vertices are **states**. Declare what a state is made of, then connect states
 with edges.
 
 ```python
-import celerispath as cp
+import celerisroute as cr
 
-states = cp.StateSpace(day=range(1, 4), port=["A", "B"])
-graph = cp.Graph(states=states)
+states = cr.StateSpace(day=range(1, 4), port=["A", "B"])
+graph = cr.Graph(states=states)
 
 graph.add_edge((1, "A"), (2, "A"), cost=1)
 graph.add_edge((1, "A"), (2, "B"), cost=5)
@@ -32,12 +32,12 @@ often as you like, between any two states. Costs may be negative.
 ## 2. A resource limit
 
 A resource adds up along the path and must stay below its upper bound. Give
-each edge its consumption and CelerisPath switches to an exact
+each edge its consumption and CelerisRoute switches to an exact
 resource-constrained search.
 
 ```python
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=10))
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=10))
 
 graph.add_edge((1, "A"), (2, "A"), cost=1, resources={"fuel": 1})   # edge 0
 graph.add_edge((1, "A"), (2, "B"), cost=5, resources={"fuel": 6})   # edge 1
@@ -71,7 +71,7 @@ are the ones that do so:
 import numpy as np
 
 A = np.array([[0.0, 0.0, 1.0, 1.0]])    # A[k, e]: coefficient of edge e in master row k
-engine = cp.PricingEngine(network, (1, "A"), (3, "B"), dual_matrix=A)
+engine = cr.PricingEngine(network, (1, "A"), (3, "B"), dual_matrix=A)
 
 result = engine.solve(np.array([12.0]))   # the duals of the restricted master
 column = result[0]

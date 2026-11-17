@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-import celerispath as cp
+import celerisroute as cr
 
 
 @dataclass
@@ -26,10 +26,10 @@ class Instance:
     def num_edges(self) -> int:
         return int(self.source.shape[0])
 
-    def build(self) -> cp.Network:
-        graph = cp.Graph(num_vertices=self.num_vertices)
+    def build(self) -> cr.Network:
+        graph = cr.Graph(num_vertices=self.num_vertices)
         for name, limit in self.upper.items():
-            graph.add_resource(cp.Resource(name=name, upper=limit))
+            graph.add_resource(cr.Resource(name=name, upper=limit))
         graph.add_edges(self.source, self.target, self.cost, resources=self.resources or None)
         return graph.compile()
 

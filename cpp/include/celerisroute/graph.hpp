@@ -10,9 +10,9 @@
 #include <utility>
 #include <vector>
 
-#include "celerispath/types.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 // Bounds of a declared resource. Edge increments live in the builder columns.
 struct ResourceSpec {
@@ -136,4 +136,4 @@ private:
 // True when `target` can be reached from `source` in an acyclic Csr.
 bool is_reachable(const Csr& csr, VertexId source, VertexId target);
 
-}  // namespace celerispath
+}  // namespace celerisroute

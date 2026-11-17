@@ -9,7 +9,7 @@ Resources add up along the path and must stay below their upper bound.
 Run with:  python examples/resource_limits.py
 """
 
-import celerispath as cp
+import celerisroute as cr
 
 #  (from, to): (cost, hours, toll legs)
 legs = {
@@ -27,9 +27,9 @@ legs = {
 }
 cities = ["Lisbon", "Porto", "Madrid", "Bordeaux", "Lyon", "Paris", "Zurich", "Berlin"]
 
-graph = cp.Graph(states=cp.StateSpace(city=cities))
-graph.add_resource(cp.Resource("hours", upper=34))
-graph.add_resource(cp.Resource("tolls", upper=2))
+graph = cr.Graph(states=cr.StateSpace(city=cities))
+graph.add_resource(cr.Resource("hours", upper=34))
+graph.add_resource(cr.Resource("tolls", upper=2))
 for (origin, destination), (cost, hours, tolls) in legs.items():
     graph.add_edge((origin,), (destination,), cost=cost, resources={"hours": hours, "tolls": tolls})
 network = graph.compile()
@@ -48,8 +48,8 @@ print("  cost: ", best.cost, " uses:", best.resources)
 print("  labels created by the search:", best.statistics.labels_created)
 
 # With a limit nobody can meet, the status says so. No exception to catch.
-strict = cp.Graph(states=cp.StateSpace(city=cities))
-strict.add_resource(cp.Resource("hours", upper=28))
+strict = cr.Graph(states=cr.StateSpace(city=cities))
+strict.add_resource(cr.Resource("hours", upper=28))
 for (origin, destination), (cost, hours, tolls) in legs.items():
     strict.add_edge((origin,), (destination,), cost=cost, resources={"hours": hours})
 print("with only 28 hours:", strict.compile().solve(("Lisbon",), ("Berlin",)).status)

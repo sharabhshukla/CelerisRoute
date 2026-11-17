@@ -19,7 +19,7 @@ import math
 
 import numpy as np
 
-import celerispath as cp
+import celerisroute as cr
 from _common import (
     format_seconds, layered_dag, reference_constrained_cost, repeat, save, summary, timed,
 )
@@ -66,7 +66,7 @@ def run(case, seed: int) -> dict:
 
     native: list[float] = []
 
-    def solve() -> cp.Solution:
+    def solve() -> cr.Solution:
         solution = network.solve(source, sink, algorithm="rcsp")
         native.append(solution.statistics.solve_time)
         return solution

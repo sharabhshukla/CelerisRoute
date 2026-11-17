@@ -4,9 +4,9 @@
 // not the same random stream), then times edge insertion, compilation, the
 // unconstrained DAG solve and a one-resource RCSP solve.
 //
-//   cmake -S . -B build/bench -DCELERISPATH_BUILD_PYTHON=OFF -DCELERISPATH_BUILD_BENCHMARKS=ON
+//   cmake -S . -B build/bench -DCELERISROUTE_BUILD_PYTHON=OFF -DCELERISROUTE_BUILD_BENCHMARKS=ON
 //   cmake --build build/bench
-//   ./build/bench/celerispath_bench [seed]
+//   ./build/bench/celerisroute_bench [seed]
 
 #include <algorithm>
 #include <chrono>
@@ -20,11 +20,11 @@
 #include <string>
 #include <vector>
 
-#include "celerispath/graph.hpp"
+#include "celerisroute/graph.hpp"
 
 namespace {
 
-using namespace celerispath;
+using namespace celerisroute;
 using Clock = std::chrono::steady_clock;
 
 double seconds_since(Clock::time_point start) {

@@ -5,7 +5,7 @@ import pytest
 import scipy.optimize
 import scipy.sparse as sp
 
-import celerispath as cp
+import celerisroute as cr
 from _reference import Instance, check_path, enumerate_paths, is_feasible, random_dag
 
 
@@ -46,7 +46,7 @@ def reference_reduced_cost(instance, matrix, duals, edges):
 @pytest.fixture
 def small():
     """0 -> {1, 2} -> 3 with one constraint row per intermediate vertex."""
-    graph = cp.Graph(num_vertices=4)
+    graph = cr.Graph(num_vertices=4)
     graph.add_edge(0, 1, 10.0)  # e0
     graph.add_edge(1, 3, 10.0)  # e1
     graph.add_edge(0, 2, 12.0)  # e2
@@ -58,7 +58,7 @@ def small():
 
 def test_columns_carry_original_and_reduced_costs(small):
     network, matrix = small
-    pricing = cp.PricingEngine(graph=network, source=0, target=3, algorithm="dag", dual_matrix=matrix)
+    pricing = cr.PricingEngine(graph=network, source=0, target=3, algorithm="dag", dual_matrix=matrix)
     assert pricing.num_constraints == 2
     assert pricing.algorithm == "dag"
     assert (pricing.source, pricing.target) == (0, 3)
@@ -83,7 +83,7 @@ def test_columns_carry_original_and_reduced_costs(small):
 
 def test_negative_only_filter_and_certificate(small):
     network, matrix = small
-    pricing = cp.PricingEngine(network, 0, 3, dual_matrix=matrix)
+    pricing = cr.PricingEngine(network, 0, 3, dual_matrix=matrix)
 
     nothing = pricing.solve([0.0, 0.0])
     assert len(nothing) == 0 and not nothing
@@ -105,7 +105,7 @@ def test_negative_only_filter_and_certificate(small):
 
 def test_repeated_dual_updates_do_not_leak_state(small):
     network, matrix = small
-    pricing = cp.PricingEngine(network, 0, 3, dual_matrix=matrix)
+    pricing = cr.PricingEngine(network, 0, 3, dual_matrix=matrix)
     sequence = [[0.0, 0.0], [50.0, 0.0], [0.0, 50.0], [-5.0, 3.0], [50.0, 0.0], [0.0, 0.0]]
     # (-5, 3): via 1 costs 20 + 5 = 25, via 2 costs 24 - 3 = 21.
     expected = [20.0, -30.0, -26.0, 21.0, -30.0, 20.0]
@@ -137,7 +137,7 @@ def test_dual_matrix_formats_agree(fmt):
         matrix = sp.lil_array(dense)
     else:
         matrix = getattr(sp, f"{fmt}_array")(dense)
-    pricing = cp.PricingEngine(network, source, target, dual_matrix=matrix)
+    pricing = cr.PricingEngine(network, source, target, dual_matrix=matrix)
     assert pricing.num_constraints == 6
     for _ in range(5):
         duals = random_duals(rng, 6)
@@ -149,10 +149,10 @@ def test_dual_matrix_formats_agree(fmt):
 
 
 def test_dual_matrix_is_copied():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 5.0)
     matrix = sp.csc_array(np.array([[1.0]]))
-    pricing = cp.PricingEngine(graph.compile(), 0, 1, dual_matrix=matrix)
+    pricing = cr.PricingEngine(graph.compile(), 0, 1, dual_matrix=matrix)
     matrix.data[0] = 100.0  # later edits by the caller must not change the engine
     assert pricing.solve([2.0], negative_only=False)[0].reduced_cost == 3.0
     assert pricing.reduced_costs([2.0]).tolist() == [3.0]
@@ -167,7 +167,7 @@ def test_dag_pricing_against_enumeration(seed):
     network = instance.build()
     num_constraints = int(rng.integers(1, 8))
     dense = random_matrix(rng, num_constraints, instance.num_edges)
-    pricing = cp.PricingEngine(network, source, target, algorithm="dag", dual_matrix=sp.csr_array(dense))
+    pricing = cr.PricingEngine(network, source, target, algorithm="dag", dual_matrix=sp.csr_array(dense))
 
     for _ in range(6):  # repeated dual updates on one engine
         duals = random_duals(rng, num_constraints)
@@ -212,7 +212,7 @@ def test_rcsp_pricing_against_enumeration(seed, num_resources):
     network = instance.build()
     num_constraints = int(rng.integers(1, 8))
     dense = random_matrix(rng, num_constraints, instance.num_edges)
-    pricing = cp.PricingEngine(network, source, target, algorithm="rcsp", dual_matrix=sp.csr_array(dense))
+    pricing = cr.PricingEngine(network, source, target, algorithm="rcsp", dual_matrix=sp.csr_array(dense))
     assert pricing.algorithm == "rcsp"
 
     for _ in range(6):
@@ -242,14 +242,14 @@ def test_rcsp_pricing_against_enumeration(seed, num_resources):
 
 
 def test_duals_change_which_path_is_resource_optimal():
-    graph = cp.Graph(num_vertices=4)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph = cr.Graph(num_vertices=4)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     graph.add_edge(0, 1, 1.0, {"fuel": 6.0})
     graph.add_edge(1, 3, 1.0, {"fuel": 6.0})  # infeasible route, visits row 0
     graph.add_edge(0, 2, 5.0, {"fuel": 2.0})
     graph.add_edge(2, 3, 5.0, {"fuel": 2.0})  # feasible route, visits row 1
     matrix = sp.csr_array(np.array([[1.0, 0, 0, 0], [0, 0, 1.0, 0]]))
-    pricing = cp.PricingEngine(graph.compile(), 0, 3, algorithm="auto", dual_matrix=matrix)
+    pricing = cr.PricingEngine(graph.compile(), 0, 3, algorithm="auto", dual_matrix=matrix)
     assert pricing.algorithm == "rcsp"
     # However attractive row 0 becomes, its route stays infeasible.
     result = pricing.solve([1000.0, 0.0])
@@ -265,22 +265,22 @@ def test_duals_change_which_path_is_resource_optimal():
 
 
 def test_parallel_and_duplicate_edges_are_distinct_columns():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 5.0)
     graph.add_edge(0, 1, 5.0)  # exact duplicate
     graph.add_edge(0, 1, 7.0)
     matrix = sp.csr_array(np.array([[1.0, 0.0, 4.0]]))
-    pricing = cp.PricingEngine(graph.compile(), 0, 1, dual_matrix=matrix)
+    pricing = cr.PricingEngine(graph.compile(), 0, 1, dual_matrix=matrix)
     result = pricing.solve([1.0], max_paths=10, negative_only=False)
     assert [(c.edges.tolist(), c.reduced_cost) for c in result] == [([2], 3.0), ([0], 4.0), ([1], 5.0)]
     assert [c.dense_coefficients().tolist() for c in result] == [[4.0], [1.0], [0.0]]
 
 
 def test_zero_cost_edges_and_ties():
-    graph = cp.Graph(num_vertices=4)
+    graph = cr.Graph(num_vertices=4)
     for source, target in ((0, 1), (1, 3), (0, 2), (2, 3)):
         graph.add_edge(source, target, 0.0)
-    pricing = cp.PricingEngine(graph.compile(), 0, 3, dual_matrix=sp.csr_array((1, 4)))
+    pricing = cr.PricingEngine(graph.compile(), 0, 3, dual_matrix=sp.csr_array((1, 4)))
     result = pricing.solve([3.0], max_paths=4, negative_only=False)
     assert [c.reduced_cost for c in result] == [0.0, 0.0]
     assert sorted(c.edges.tolist() for c in result) == [[0, 1], [2, 3]]
@@ -289,14 +289,14 @@ def test_zero_cost_edges_and_ties():
 
 
 def test_fixed_cost_and_fixed_coefficients():
-    graph = cp.Graph(num_vertices=3)
+    graph = cr.Graph(num_vertices=3)
     graph.add_edge(0, 1, 4.0)
     graph.add_edge(1, 2, 6.0)
     network = graph.compile()
     # Row 0: covering constraint touched by edge 0. Row 1: convexity row of this vehicle.
     matrix = sp.csr_array(np.array([[1.0, 0.0], [0.0, 0.0]]))
     for fixed in ([0.0, 1.0], {1: 1.0}, sp.csc_array(np.array([[0.0], [1.0]])), np.array([0.0, 1.0])):
-        pricing = cp.PricingEngine(
+        pricing = cr.PricingEngine(
             network, 0, 2, dual_matrix=matrix, fixed_cost=100.0, fixed_coefficients=fixed
         )
         assert pricing.fixed_cost == 100.0
@@ -309,39 +309,39 @@ def test_fixed_cost_and_fixed_coefficients():
         assert len(pricing.solve([7.0, 90.0])) == 0
         assert len(pricing.solve([7.0, 110.0])) == 1
     # Fixed coefficients on a row the path also touches are summed.
-    pricing = cp.PricingEngine(network, 0, 2, dual_matrix=matrix, fixed_coefficients={0: 2.0})
+    pricing = cr.PricingEngine(network, 0, 2, dual_matrix=matrix, fixed_coefficients={0: 2.0})
     column = pricing.solve([1.0, 0.0], negative_only=False)[0]
     assert column.dense_coefficients().tolist() == [3.0, 0.0] and column.reduced_cost == 7.0
 
 
 def test_engine_without_dual_matrix():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 4.0)
     network = graph.compile()
-    plain = cp.PricingEngine(network, 0, 1)
+    plain = cr.PricingEngine(network, 0, 1)
     assert plain.num_constraints == 0
     assert plain.solve([], negative_only=False)[0].reduced_cost == 4.0
-    convexity = cp.PricingEngine(network, 0, 1, fixed_coefficients=[1.0])
+    convexity = cr.PricingEngine(network, 0, 1, fixed_coefficients=[1.0])
     assert convexity.num_constraints == 1
     assert convexity.solve([10.0])[0].reduced_cost == -6.0
 
 
 def test_unreachable_and_infeasible_pricing_problems():
-    graph = cp.Graph(num_vertices=4)
-    graph.add_resource(cp.Resource("fuel", upper=1.0))
+    graph = cr.Graph(num_vertices=4)
+    graph.add_resource(cr.Resource("fuel", upper=1.0))
     graph.add_edge(0, 1, 1.0, {"fuel": 2.0})
     graph.add_edge(2, 3, 1.0)
     network = graph.compile()
     matrix = sp.csr_array((3, 2))
 
-    unreachable = cp.PricingEngine(network, 0, 3, dual_matrix=matrix)
+    unreachable = cr.PricingEngine(network, 0, 3, dual_matrix=matrix)
     assert not unreachable.is_target_reachable
     assert unreachable.num_active_edges == 0
     result = unreachable.solve(np.ones(3), negative_only=False)
     assert result.status == "unreachable" and len(result) == 0
     assert result.best_reduced_cost == math.inf
 
-    infeasible = cp.PricingEngine(network, 0, 1, dual_matrix=matrix)
+    infeasible = cr.PricingEngine(network, 0, 1, dual_matrix=matrix)
     assert infeasible.is_target_reachable
     result = infeasible.solve(np.ones(3), negative_only=False)
     assert result.status == "infeasible" and len(result) == 0
@@ -349,13 +349,13 @@ def test_unreachable_and_infeasible_pricing_problems():
 
 def test_engine_prunes_to_the_relevant_subgraph():
     # A long chain 0..9 plus a side branch 3 -> 10 -> 11 that never returns.
-    graph = cp.Graph(num_vertices=12)
+    graph = cr.Graph(num_vertices=12)
     for v in range(9):
         graph.add_edge(v, v + 1, 1.0)
     graph.add_edge(3, 10, 1.0)
     graph.add_edge(10, 11, 1.0)
     network = graph.compile()
-    pricing = cp.PricingEngine(network, 2, 6)
+    pricing = cr.PricingEngine(network, 2, 6)
     assert pricing.num_active_vertices == 5  # 2, 3, 4, 5, 6
     assert pricing.num_active_edges == 4
     assert pricing.solve([], negative_only=False)[0].path == [2, 3, 4, 5, 6]
@@ -363,9 +363,9 @@ def test_engine_prunes_to_the_relevant_subgraph():
 
 
 def test_source_equals_target():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 1.0)
-    pricing = cp.PricingEngine(graph.compile(), 0, 0, fixed_cost=3.0, fixed_coefficients=[1.0])
+    pricing = cr.PricingEngine(graph.compile(), 0, 0, fixed_cost=3.0, fixed_coefficients=[1.0])
     assert len(pricing.solve([5.0], negative_only=False)) == 1
     column = pricing.solve([5.0])[0]
     assert column.edges.size == 0 and column.path == [0]
@@ -373,14 +373,14 @@ def test_source_equals_target():
 
 
 def test_state_space_columns_decode_paths():
-    states = cp.StateSpace(day=range(1, 4), port=["A", "B"])
-    graph = cp.Graph(states=states)
+    states = cr.StateSpace(day=range(1, 4), port=["A", "B"])
+    graph = cr.Graph(states=states)
     visit = graph.add_edge((1, "A"), (2, "B"), 5.0)
     graph.add_edge((2, "B"), (3, "A"), 5.0)
     graph.add_edge((1, "A"), (3, "A"), 9.0)
     network = graph.compile()
     matrix = sp.coo_array(([1.0], ([0], [visit])), shape=(1, network.num_edges))
-    pricing = cp.PricingEngine(network, (1, "A"), (3, "A"), dual_matrix=matrix, name="vessel-1")
+    pricing = cr.PricingEngine(network, (1, "A"), (3, "A"), dual_matrix=matrix, name="vessel-1")
     assert pricing.name == "vessel-1" and "vessel-1" in repr(pricing)
     column = pricing.solve([4.0], negative_only=False)[0]
     assert column.path == [(1, "A"), (2, "B"), (3, "A")]
@@ -391,20 +391,20 @@ def test_state_space_columns_decode_paths():
 
 
 def test_multiple_paths_with_rcsp_raise_not_implemented():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
     graph.add_edge(0, 1, 1.0, {"fuel": 1.0})
     graph.add_edge(1, 2, 1.0, {"fuel": 1.0})
     network = graph.compile()
-    pricing = cp.PricingEngine(network, 0, 2, algorithm="rcsp")
+    pricing = cr.PricingEngine(network, 0, 2, algorithm="rcsp")
     with pytest.raises(NotImplementedError, match="max_paths > 1"):
         pricing.solve([], max_paths=2)
     assert len(pricing.solve([], max_paths=1, negative_only=False)) == 1
     # The unconstrained engine on the same network supports it.
-    relaxed = cp.PricingEngine(network, 0, 2, algorithm="dag", unconstrained=True)
+    relaxed = cr.PricingEngine(network, 0, 2, algorithm="dag", unconstrained=True)
     assert len(relaxed.solve([], max_paths=2, negative_only=False)) == 1
     with pytest.raises(ValueError, match="unconstrained=True"):
-        cp.PricingEngine(network, 0, 2, algorithm="dag")
+        cr.PricingEngine(network, 0, 2, algorithm="dag")
 
 
 # ------------------------------------------------------------ invalid input
@@ -412,45 +412,45 @@ def test_multiple_paths_with_rcsp_raise_not_implemented():
 
 def test_invalid_engine_construction(small):
     network, matrix = small
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     with pytest.raises(TypeError, match="compile"):
-        cp.PricingEngine(graph, 0, 1)
+        cr.PricingEngine(graph, 0, 1)
     with pytest.raises(TypeError):
-        cp.PricingEngine("network", 0, 1)
+        cr.PricingEngine("network", 0, 1)
     with pytest.raises(ValueError, match="one column per edge"):
-        cp.PricingEngine(network, 0, 3, dual_matrix=sp.csr_array((2, 5)))
+        cr.PricingEngine(network, 0, 3, dual_matrix=sp.csr_array((2, 5)))
     with pytest.raises(ValueError, match="one column per edge"):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix.T)
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix.T)
     with pytest.raises((TypeError, ValueError)):
-        cp.PricingEngine(network, 0, 3, dual_matrix=np.zeros(4))
+        cr.PricingEngine(network, 0, 3, dual_matrix=np.zeros(4))
     with pytest.raises(TypeError):
-        cp.PricingEngine(network, 0, 3, dual_matrix="matrix")
+        cr.PricingEngine(network, 0, 3, dual_matrix="matrix")
     for bad in (np.nan, np.inf):
         dense = np.zeros((2, 4))
         dense[1, 2] = bad
         with pytest.raises(ValueError, match="NaN or infinite"):
-            cp.PricingEngine(network, 0, 3, dual_matrix=dense)
-    with pytest.raises(cp.InvalidStateError):
-        cp.PricingEngine(network, 0, 9, dual_matrix=matrix)
+            cr.PricingEngine(network, 0, 3, dual_matrix=dense)
+    with pytest.raises(cr.InvalidStateError):
+        cr.PricingEngine(network, 0, 9, dual_matrix=matrix)
     with pytest.raises(ValueError, match="algorithm"):
-        cp.PricingEngine(network, 0, 3, algorithm="astar", dual_matrix=matrix)
+        cr.PricingEngine(network, 0, 3, algorithm="astar", dual_matrix=matrix)
     with pytest.raises(ValueError):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_cost=math.inf)
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_cost=math.inf)
     with pytest.raises(TypeError):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_cost="free")
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_cost="free")
     with pytest.raises(ValueError, match="length 3"):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients=[1.0, 2.0, 3.0])
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients=[1.0, 2.0, 3.0])
     with pytest.raises(ValueError, match="outside"):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients={2: 1.0})
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients={2: 1.0})
     with pytest.raises(ValueError, match="finite"):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients=[1.0, math.nan])
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, fixed_coefficients=[1.0, math.nan])
     with pytest.raises(ValueError):
-        cp.PricingEngine(network, 0, 3, dual_matrix=matrix, dominance_tolerance=-1.0)
+        cr.PricingEngine(network, 0, 3, dual_matrix=matrix, dominance_tolerance=-1.0)
 
 
 def test_invalid_solve_arguments(small):
     network, matrix = small
-    pricing = cp.PricingEngine(network, 0, 3, dual_matrix=matrix)
+    pricing = cr.PricingEngine(network, 0, 3, dual_matrix=matrix)
     with pytest.raises(ValueError, match=r"expected \(2,\)"):
         pricing.solve([1.0, 2.0, 3.0])
     with pytest.raises(ValueError, match=r"expected \(2,\)"):
@@ -524,7 +524,7 @@ def test_column_generation_reaches_the_lp_optimum(seed):
     instance, matrix, source, sink = routing_instance(seed)
     num_rows = matrix.shape[0]
     network = instance.build()
-    pricing = cp.PricingEngine(network, source, sink, algorithm="rcsp", dual_matrix=matrix)
+    pricing = cr.PricingEngine(network, source, sink, algorithm="rcsp", dual_matrix=matrix)
 
     # Reference: the LP over every feasible route.
     dense = matrix.toarray()

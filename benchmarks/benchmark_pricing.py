@@ -21,7 +21,7 @@ import time
 import numpy as np
 import scipy.sparse as sp
 
-import celerispath as cp
+import celerisroute as cr
 from _common import format_seconds, layered_dag, reference_cost, save, summary, timed
 from benchmark_rcsp import resource_bounds
 
@@ -64,7 +64,7 @@ def make_engine(algorithm: str, num_vertices: int, width: int, degree: int, rng,
     build_seconds, graph = timed(instance.graph, bounds)
     compile_seconds, network = timed(graph.compile)
     engine_seconds, engine = timed(
-        cp.PricingEngine, network, instance.source, instance.sink,
+        cr.PricingEngine, network, instance.source, instance.sink,
         algorithm=algorithm, dual_matrix=matrix,
     )
     if timings is not None:
@@ -135,7 +135,7 @@ def batch_pricing(case, seed: int) -> list[dict]:
     rows = []
     for size in BATCH_SIZES:
         subset = engines[:size]
-        batch = cp.BatchPricingEngine(subset)
+        batch = cr.BatchPricingEngine(subset)
         serial: list[float] = []
         parallel: dict[int, list[float]] = {threads: [] for threads in thread_counts}
         batch.solve_batch(np.zeros(NUM_ROWS), threads=hardware, negative_only=False)  # warm-up

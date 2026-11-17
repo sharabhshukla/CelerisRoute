@@ -1,4 +1,4 @@
-#include "celerispath/pricing_engine.hpp"
+#include "celerisroute/pricing_engine.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -9,7 +9,7 @@
 #include <system_error>
 #include <thread>
 
-namespace celerispath {
+namespace celerisroute {
 
 namespace {
 
@@ -351,4 +351,4 @@ BatchOutcome solve_batch(std::span<PricingEngine* const> engines,
     return outcome;
 }
 
-}  // namespace celerispath
+}  // namespace celerisroute

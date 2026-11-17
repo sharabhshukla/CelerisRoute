@@ -19,7 +19,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.optimize import Bounds, LinearConstraint, linprog, milp
 
-import celerispath as cp
+import celerisroute as cr
 
 DAYS = range(1, 31)
 PORTS = ["Dubai", "Mumbai", "Singapore", "Rotterdam"]
@@ -56,9 +56,9 @@ num_contracts, num_vessels = len(CONTRACTS), len(names)
 num_rows = num_contracts + num_vessels
 
 # ---- the network: built once, shared by all vessels ---------------------------
-states = cp.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=tanks.max()))
+states = cr.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=tanks.max()))
 delivery_rows, delivery_edges = [], []  # which edge delivers which contract
 mumbai_edges = []                       # every edge that arrives in Mumbai
 
@@ -92,7 +92,7 @@ A = sp.csr_array((np.ones(len(delivery_edges)), (delivery_rows, delivery_edges))
                  shape=(num_rows, network.num_edges))
 
 # ---- the fleet: one network, twelve small vessel profiles ---------------------
-fleet = cp.PricingFleet(network, dual_matrix=A)
+fleet = cr.PricingFleet(network, dual_matrix=A)
 fleet.add_vessels(
     ids=names,
     source=[(1, home, "empty") for home in homes],

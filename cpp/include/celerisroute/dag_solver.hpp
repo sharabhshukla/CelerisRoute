@@ -6,9 +6,9 @@
 
 #include <boost/graph/properties.hpp>
 
-#include "celerispath/types.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 // Scratch buffers reused across solves; sized on first use.
 struct DagWorkspace {
@@ -36,11 +36,11 @@ struct KBestWorkspace {
 };
 
 // The k cheapest distinct source-target paths in nondecreasing cost order
-// (fewer if fewer exist). This is celerispath's own dynamic program over the
+// (fewer if fewer exist). This is celerisroute's own dynamic program over the
 // cached topological order; Boost has no k-shortest-path routine for DAGs.
 // Runs in O(V + E * k^2) time and O(V * k) memory.
 std::vector<PathResult> solve_dag_k_best(const Csr& csr, const double* slot_cost, VertexId source,
                                          VertexId target, std::uint32_t k,
                                          KBestWorkspace& workspace);
 
-}  // namespace celerispath
+}  // namespace celerisroute

@@ -1,4 +1,4 @@
-#include "celerispath/graph.hpp"
+#include "celerisroute/graph.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -6,10 +6,10 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "celerispath/dag_solver.hpp"
-#include "celerispath/rcsp_solver.hpp"
+#include "celerisroute/dag_solver.hpp"
+#include "celerisroute/rcsp_solver.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 namespace {
 
@@ -440,4 +440,4 @@ bool is_reachable(const Csr& csr, VertexId source, VertexId target) {
     return false;
 }
 
-}  // namespace celerispath
+}  // namespace celerisroute

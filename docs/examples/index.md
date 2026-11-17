@@ -45,12 +45,12 @@ library.
 
 ## Running them
 
-The examples need only CelerisPath itself; SciPy, which solves the master
+The examples need only CelerisRoute itself; SciPy, which solves the master
 problems, is already a dependency.
 
 ```bash
-git clone https://github.com/sharabhshukla/CelerisPath
-cd CelerisPath
+git clone https://github.com/sharabhshukla/CelerisRoute
+cd CelerisRoute
 python examples/shortest_path.py
 ```
 

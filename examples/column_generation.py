@@ -23,7 +23,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.optimize import Bounds, LinearConstraint, linprog, milp
 
-import celerispath as cp
+import celerisroute as cr
 
 DAYS = range(1, 31)
 PORTS = ["Dubai", "Mumbai", "Singapore", "Rotterdam"]
@@ -54,9 +54,9 @@ VESSELS = {"Aurora": "Dubai", "Borealis": "Dubai", "Calypso": "Singapore"}  # na
 num_rows = len(CONTRACTS) + len(VESSELS)  # contract rows first, then vessel rows
 
 # ---- the network: the same for every vessel -----------------------------------
-states = cp.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=FUEL_TANK))
+states = cr.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=FUEL_TANK))
 delivery_rows, delivery_edges = [], []  # which edge delivers which contract
 
 for day in DAYS:
@@ -92,11 +92,11 @@ A = sp.csr_array((np.ones(len(delivery_edges)), (delivery_rows, delivery_edges))
 # Every route of vessel v also has a -1 in that vessel's own row.
 engines = []
 for v, (name, home) in enumerate(VESSELS.items()):
-    engines.append(cp.PricingEngine(
+    engines.append(cr.PricingEngine(
         network, (1, home, "empty"), (30, home, "empty"),
         dual_matrix=A, fixed_coefficients={len(CONTRACTS) + v: -1.0}, name=name,
     ))
-pricing = cp.BatchPricingEngine(engines)  # solves all engines in parallel
+pricing = cr.BatchPricingEngine(engines)  # solves all engines in parallel
 
 # ---- the master problem -------------------------------------------------------
 # Start with one column per contract: "do not deliver, pay the penalty".

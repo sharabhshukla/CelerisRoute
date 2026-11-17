@@ -7,7 +7,7 @@ truck carries paid freight on it; negative costs are fine on a DAG.
 Run with:  python examples/shortest_path.py
 """
 
-import celerispath as cp
+import celerisroute as cr
 
 legs = {
     ("Lisbon", "Madrid"): 180,
@@ -25,9 +25,9 @@ legs = {
 
 # Vertices are named states. Here a state is just a city.
 cities = ["Lisbon", "Porto", "Madrid", "Bordeaux", "Lyon", "Paris", "Zurich", "Berlin"]
-states = cp.StateSpace(city=cities)
+states = cr.StateSpace(city=cities)
 
-graph = cp.Graph(states=states)
+graph = cr.Graph(states=states)
 for (origin, destination), cost in legs.items():
     graph.add_edge((origin,), (destination,), cost=cost)
 

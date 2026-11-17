@@ -9,12 +9,12 @@
 #include <string>
 #include <vector>
 
-#include "celerispath/dag_solver.hpp"
-#include "celerispath/graph.hpp"
-#include "celerispath/rcsp_solver.hpp"
-#include "celerispath/types.hpp"
+#include "celerisroute/dag_solver.hpp"
+#include "celerisroute/graph.hpp"
+#include "celerisroute/rcsp_solver.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 // Master-constraint coefficients A (num_rows x num_edges) in compressed
 // sparse column form: column e lists edge e's contribution to each row.
@@ -133,4 +133,4 @@ BatchOutcome solve_batch(std::span<PricingEngine* const> engines,
                          std::span<const std::span<const double>> duals, std::uint32_t max_paths,
                          bool negative_only, double tolerance, unsigned threads);
 
-}  // namespace celerispath
+}  // namespace celerisroute

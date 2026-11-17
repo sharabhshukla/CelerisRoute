@@ -1,4 +1,4 @@
-#include "celerispath/dag_solver.hpp"
+#include "celerisroute/dag_solver.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -6,9 +6,9 @@
 #include <boost/graph/dag_shortest_paths.hpp>
 #include <boost/property_map/property_map.hpp>
 
-#include "celerispath/bgl_adaptor.hpp"
+#include "celerisroute/bgl_adaptor.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 namespace {
 
@@ -135,4 +135,4 @@ std::vector<PathResult> solve_dag_k_best(const Csr& csr, const double* slot_cost
     return results;
 }
 
-}  // namespace celerispath
+}  // namespace celerisroute

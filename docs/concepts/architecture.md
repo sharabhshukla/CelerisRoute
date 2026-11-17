@@ -1,18 +1,18 @@
 # Architecture
 
-CelerisPath is a thin, typed Python layer over a C++20 core. Python does the
+CelerisRoute is a thin, typed Python layer over a C++20 core. Python does the
 modelling and the validation; C++ does everything that runs once per edge or
 once per label.
 
 ```mermaid
 flowchart TB
-    subgraph py["Python: src/celerispath"]
+    subgraph py["Python: src/celerisroute"]
         direction LR
         S["StateSpace"] --> G["Graph"] --> NW["Network"]
         NW --> PE["PricingEngine<br/>BatchPricingEngine"]
         NW --> PF["PricingFleet"]
     end
-    B["nanobind module<br/>celerispath._core"]
+    B["nanobind module<br/>celerisroute._core"]
     subgraph cpp["C++20 core: cpp/"]
         direction LR
         CG["CompiledGraph<br/>CSR + topological order"]
@@ -44,7 +44,7 @@ decoded to states lazily, when you read `solution.path`.
 ## Boost, without copying
 
 The solvers are the Boost Graph Library's `dag_shortest_paths` and
-`r_c_shortest_paths`. Boost normally wants its own graph type; CelerisPath
+`r_c_shortest_paths`. Boost normally wants its own graph type; CelerisRoute
 instead presents its compressed adjacency arrays to Boost through a small
 adaptor (`bgl_adaptor.hpp`), so no second copy of the graph exists and the
 pricing code can swap the cost array on each iteration.
@@ -56,7 +56,7 @@ appears in the Python API.
 
 ```text
 cpp/
-  include/celerispath/
+  include/celerisroute/
     types.hpp            ids, CSR, statistics, result structs
     graph.hpp            GraphBuilder, CompiledGraph
     bgl_adaptor.hpp      presents the CSR to Boost.Graph without copying
@@ -66,9 +66,9 @@ cpp/
     pricing_engine.hpp   one subproblem, batch solve on std::thread
     pricing_fleet.hpp    shared reduced costs, vessel profiles, schedulers
   src/                   the matching .cpp files
-  bindings/python.cpp    the nanobind module celerispath._core
+  bindings/python.cpp    the nanobind module celerisroute._core
   bench/bench_core.cpp   native benchmark harness
-src/celerispath/         Python API: states, graph, resources, solvers,
+src/celerisroute/        Python API: states, graph, resources, solvers,
                          pricing, fleet, results, errors
 tests/                   pytest suite
 examples/                runnable scripts
@@ -85,7 +85,7 @@ dominance, bidirectional search, label limits, K-best RCSP) can replace
 
 New resource types need a new extension and dominance rule in
 `cpp/src/rcsp_solver.cpp` and a new `sense` in
-`src/celerispath/resources.py`.
+`src/celerisroute/resources.py`.
 
 ## Build
 
@@ -96,6 +96,6 @@ static library that does not depend on Python, which is what the native
 benchmark harness links against:
 
 ```bash
-cmake -S . -B build/bench -DCELERISPATH_BUILD_PYTHON=OFF -DCELERISPATH_BUILD_BENCHMARKS=ON
+cmake -S . -B build/bench -DCELERISROUTE_BUILD_PYTHON=OFF -DCELERISROUTE_BUILD_BENCHMARKS=ON
 cmake --build build/bench
 ```

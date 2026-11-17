@@ -126,7 +126,7 @@ class _PathMixin:
         """States along the path, source first.
 
         Decoded state tuples when the graph was built on a
-        ``celerispath.StateSpace``, plain vertex ids otherwise. Decoding
+        ``celerisroute.StateSpace``, plain vertex ids otherwise. Decoding
         happens on first access.
         """
         if self._path is None:

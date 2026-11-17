@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-import celerispath as cp
+import celerisroute as cr
 from _reference import (
     best_cost,
     check_path,
@@ -15,10 +15,10 @@ from _reference import (
 )
 
 
-def diamond(upper: float, **resource_options) -> cp.Network:
+def diamond(upper: float, **resource_options) -> cr.Network:
     """Two routes 0 -> 3: cheap but thirsty (via 1), dear but frugal (via 2)."""
-    graph = cp.Graph(num_vertices=4)
-    graph.add_resource(cp.Resource("fuel", upper=upper, **resource_options))
+    graph = cr.Graph(num_vertices=4)
+    graph.add_resource(cr.Resource("fuel", upper=upper, **resource_options))
     graph.add_edge(0, 1, 1.0, {"fuel": 6.0})
     graph.add_edge(1, 3, 1.0, {"fuel": 6.0})
     graph.add_edge(0, 2, 5.0, {"fuel": 2.0})
@@ -48,7 +48,7 @@ def test_bounds_hold_at_exact_limits():
 
 def test_infeasible_resource_restrictions():
     solution = diamond(upper=3.0).solve(0, 3)
-    assert solution.status == "infeasible" and solution.status is cp.Status.INFEASIBLE
+    assert solution.status == "infeasible" and solution.status is cr.Status.INFEASIBLE
     assert not solution
     assert solution.cost == float("inf")
     assert solution.edges.size == 0 and solution.path == [] and solution.resources == {}
@@ -61,17 +61,17 @@ def test_bound_is_checked_along_the_path_not_only_at_the_end():
     # With nonnegative increments the running total is monotone, so the check at
     # the end implies the check everywhere; make sure an early violation is
     # caught even when the target is never reached through it.
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
     graph.add_edge(0, 1, 1.0, {"fuel": 6.0})
     graph.add_edge(1, 2, 1.0, {"fuel": 0.0})
     assert graph.compile().solve(0, 2).status == "infeasible"
 
 
 def test_two_resources():
-    graph = cp.Graph(num_vertices=5)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
-    graph.add_resource(cp.Resource("time", upper=8.0))
+    graph = cr.Graph(num_vertices=5)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
+    graph.add_resource(cr.Resource("time", upper=8.0))
     # Three routes 0 -> 4 with (cost, fuel, time):
     graph.add_edge(0, 1, 1.0, {"fuel": 6.0, "time": 1.0})
     graph.add_edge(1, 4, 1.0, {"fuel": 6.0, "time": 1.0})  # (2, 12, 2): too much fuel
@@ -81,7 +81,7 @@ def test_two_resources():
     graph.add_edge(3, 4, 4.0, {"fuel": 4.0, "time": 3.0})  # (8, 8, 6): feasible
     network = graph.compile()
     assert network.tracked_resources == ("fuel", "time")
-    solution = cp.resource_shortest_path(network, 0, 4)
+    solution = cr.resource_shortest_path(network, 0, 4)
     assert solution.cost == 8.0
     assert solution.path == [0, 3, 4]
     assert solution.resources == {"fuel": 8.0, "time": 6.0}
@@ -90,8 +90,8 @@ def test_two_resources():
 def test_equal_labels_keep_exactly_one():
     # Two routes with identical cost and consumption: each dominates the other
     # in the weak sense. One must survive, and only one.
-    graph = cp.Graph(num_vertices=5)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph = cr.Graph(num_vertices=5)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     graph.add_edge(0, 1, 2.0, {"fuel": 3.0})
     graph.add_edge(1, 3, 2.0, {"fuel": 3.0})
     graph.add_edge(0, 2, 2.0, {"fuel": 3.0})
@@ -109,8 +109,8 @@ def test_equal_labels_keep_exactly_one():
 
 
 def test_equal_parallel_edges():
-    graph = cp.Graph(num_vertices=2)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph = cr.Graph(num_vertices=2)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     graph.add_edge(0, 1, 2.0, {"fuel": 3.0})
     graph.add_edge(0, 1, 2.0, {"fuel": 3.0})
     solution = graph.compile().solve(0, 1)
@@ -121,8 +121,8 @@ def test_equal_parallel_edges():
 def test_multiple_nondominated_labels():
     # k parallel trade-offs between consecutive vertices: every combination that
     # is not dominated has to be carried forward.
-    graph = cp.Graph(num_vertices=4)
-    graph.add_resource(cp.Resource("fuel", upper=9.0))
+    graph = cr.Graph(num_vertices=4)
+    graph.add_resource(cr.Resource("fuel", upper=9.0))
     for a in range(3):
         graph.add_edge(a, a + 1, 1.0, {"fuel": 4.0})  # cheap, thirsty
         graph.add_edge(a, a + 1, 3.0, {"fuel": 2.0})  # dear, frugal
@@ -143,8 +143,8 @@ def test_cheaper_but_thirstier_label_is_not_pruned():
     # At vertex 1 the cheap label has used more fuel. Pruning it by cost alone
     # (or the dear one by fuel alone) would lose the optimum for one of the bounds.
     def solve(upper):
-        graph = cp.Graph(num_vertices=3)
-        graph.add_resource(cp.Resource("fuel", upper=upper))
+        graph = cr.Graph(num_vertices=3)
+        graph.add_resource(cr.Resource("fuel", upper=upper))
         graph.add_edge(0, 1, 1.0, {"fuel": 5.0})
         graph.add_edge(0, 1, 4.0, {"fuel": 1.0})
         graph.add_edge(1, 2, 1.0, {"fuel": 5.0})
@@ -156,8 +156,8 @@ def test_cheaper_but_thirstier_label_is_not_pruned():
 
 
 def test_negative_costs_with_resources():
-    graph = cp.Graph(num_vertices=4)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
+    graph = cr.Graph(num_vertices=4)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
     graph.add_edge(0, 1, 2.0, {"fuel": 1.0})
     graph.add_edge(1, 3, -10.0, {"fuel": 5.0})  # tempting but infeasible after edge 0
     graph.add_edge(0, 2, 3.0, {"fuel": 2.0})
@@ -167,9 +167,9 @@ def test_negative_costs_with_resources():
 
 
 def test_zero_increment_edges_and_unused_resources():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=1.0))
-    graph.add_resource(cp.Resource("crew", upper=2.0, initial=2.0))  # never consumed
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=1.0))
+    graph.add_resource(cr.Resource("crew", upper=2.0, initial=2.0))  # never consumed
     graph.add_edge(0, 1, 1.0)  # no increments at all
     graph.add_edge(1, 2, 1.0, {"fuel": 1.0})
     solution = graph.compile().solve(0, 2)
@@ -185,9 +185,9 @@ def test_source_equals_target_with_resources():
 
 def test_many_resources_use_the_general_code_path():
     names = [f"r{i}" for i in range(6)]
-    graph = cp.Graph(num_vertices=3)
+    graph = cr.Graph(num_vertices=3)
     for name in names:
-        graph.add_resource(cp.Resource(name, upper=3.0))
+        graph.add_resource(cr.Resource(name, upper=3.0))
     graph.add_edge(0, 1, 1.0, {name: 1.0 for name in names})
     graph.add_edge(1, 2, 1.0, {name: 2.0 for name in names})
     graph.add_edge(0, 2, 9.0, {"r5": 3.0})
@@ -211,7 +211,7 @@ def test_dominance_tolerance_is_a_documented_heuristic():
     network = diamond(upper=100.0)
     assert network.solve(0, 3, dominance_tolerance=0.0).cost == 2.0
     assert network.solve(0, 3, dominance_tolerance=1e-9).cost == 2.0
-    assert cp.resource_shortest_path(network, 0, 3, dominance_tolerance=1e-9).cost == 2.0
+    assert cr.resource_shortest_path(network, 0, 3, dominance_tolerance=1e-9).cost == 2.0
 
 
 # ------------------------------------------------------------ declarations
@@ -219,31 +219,31 @@ def test_dominance_tolerance_is_a_documented_heuristic():
 
 def test_resource_validation():
     with pytest.raises(NotImplementedError, match="cumulative"):
-        cp.Resource("fuel", upper=10.0, sense="replenishable")
+        cr.Resource("fuel", upper=10.0, sense="replenishable")
     with pytest.raises(ValueError):
-        cp.Resource("fuel", lower=5.0, upper=1.0)
+        cr.Resource("fuel", lower=5.0, upper=1.0)
     with pytest.raises(ValueError):
-        cp.Resource("fuel", upper=5.0, initial=6.0)
+        cr.Resource("fuel", upper=5.0, initial=6.0)
     with pytest.raises(ValueError):
-        cp.Resource("fuel", lower=2.0, initial=0.0)  # would need a minimum-consumption rule
+        cr.Resource("fuel", lower=2.0, initial=0.0)  # would need a minimum-consumption rule
     with pytest.raises(ValueError):
-        cp.Resource("fuel", upper=math.nan)
+        cr.Resource("fuel", upper=math.nan)
     with pytest.raises(ValueError):
-        cp.Resource("fuel", initial=math.inf)
+        cr.Resource("fuel", initial=math.inf)
     with pytest.raises(TypeError):
-        cp.Resource("", upper=1.0)
+        cr.Resource("", upper=1.0)
     with pytest.raises(TypeError):
-        cp.Resource("fuel", upper="full")
-    resource = cp.Resource(name="fuel", lower=0.0, upper=100.0, initial=0.0, sense="cumulative")
+        cr.Resource("fuel", upper="full")
+    resource = cr.Resource(name="fuel", lower=0.0, upper=100.0, initial=0.0, sense="cumulative")
     assert resource.is_constraining
-    assert not cp.Resource("distance").is_constraining
+    assert not cr.Resource("distance").is_constraining
 
 
 def test_resource_declaration_errors():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     with pytest.raises(ValueError, match="already declared"):
-        graph.add_resource(cp.Resource("fuel", upper=20.0))
+        graph.add_resource(cr.Resource("fuel", upper=20.0))
     with pytest.raises(TypeError):
         graph.add_resource("fuel")
     with pytest.raises(ValueError, match=">= 0"):
@@ -254,17 +254,17 @@ def test_resource_declaration_errors():
 
 
 def test_undeclared_resource_is_rejected_at_compile():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     graph.add_edge(0, 1, 1.0, {"feul": 3.0})  # typo
     with pytest.raises(ValueError, match="feul"):
         graph.compile()
 
 
 def test_negative_increment_declared_late_is_rejected_at_compile():
-    graph = cp.Graph(num_vertices=3)
+    graph = cr.Graph(num_vertices=3)
     graph.add_edge(0, 1, 1.0, {"fuel": -3.0})  # accepted: not yet known to be cumulative
-    graph.add_resource(cp.Resource("fuel", upper=10.0))
+    graph.add_resource(cr.Resource("fuel", upper=10.0))
     with pytest.raises(ValueError, match="fuel"):
         graph.compile()
 
@@ -352,8 +352,8 @@ def test_completion_bound_keeps_paths_exactly_at_the_limit():
         for value in increments:
             accumulated += value  # exactly how the solver accumulates
         for upper, expected in ((accumulated, "optimal"), (math.nextafter(accumulated, 0.0), "infeasible")):
-            graph = cp.Graph(num_vertices=count + 1)
-            graph.add_resource(cp.Resource("r", upper=upper))
+            graph = cr.Graph(num_vertices=count + 1)
+            graph.add_resource(cr.Resource("r", upper=upper))
             for index, value in enumerate(increments):
                 graph.add_edge(index, index + 1, 1.0, resources={"r": value})
             solution = graph.compile().solve(0, count)
@@ -365,8 +365,8 @@ def test_completion_bound_keeps_paths_exactly_at_the_limit():
 def test_labels_that_cannot_be_completed_are_not_created():
     # 0 -> 1 -> 2 is the only route to the target; 0 also fans out into dead
     # ends (3..9) and into a detour (10) that is too expensive to complete.
-    graph = cp.Graph(num_vertices=11)
-    graph.add_resource(cp.Resource("r", upper=10.0))
+    graph = cr.Graph(num_vertices=11)
+    graph.add_resource(cr.Resource("r", upper=10.0))
     graph.add_edge(0, 1, 1.0, resources={"r": 4.0})
     graph.add_edge(1, 2, 1.0, resources={"r": 4.0})
     for dead_end in range(3, 10):

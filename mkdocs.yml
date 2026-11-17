@@ -1,9 +1,9 @@
-site_name: CelerisPath
+site_name: CelerisRoute
 site_description: Fast shortest paths on state-space DAGs for column-generation pricing. C++20 core, Python API.
-site_url: https://sharabhshukla.github.io/CelerisPath/
+site_url: https://sharabhshukla.github.io/CelerisRoute/
 site_author: Sharabh S
-repo_url: https://github.com/sharabhshukla/CelerisPath
-repo_name: sharabhshukla/CelerisPath
+repo_url: https://github.com/sharabhshukla/CelerisRoute
+repo_name: sharabhshukla/CelerisRoute
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2026 Sharabh S. Released under the MIT License.
 
@@ -140,6 +140,6 @@ extra_css:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/sharabhshukla/CelerisPath
+      link: https://github.com/sharabhshukla/CelerisRoute
     - icon: fontawesome/brands/python
-      link: https://test.pypi.org/project/celerispath/
+      link: https://test.pypi.org/project/celerisroute/

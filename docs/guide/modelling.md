@@ -1,6 +1,6 @@
 # Modelling a network
 
-Everything in CelerisPath starts with a directed acyclic graph. This page
+Everything in CelerisRoute starts with a directed acyclic graph. This page
 shows how to describe one in terms of your problem, not in terms of integer
 ids.
 
@@ -10,9 +10,9 @@ A `StateSpace` is the Cartesian product of named dimensions. Each combination
 is one vertex.
 
 ```python
-import celerispath as cp
+import celerisroute as cr
 
-states = cp.StateSpace(day=range(1, 31), port=["Dubai", "Mumbai", "Singapore"], cargo=["empty", "full"])
+states = cr.StateSpace(day=range(1, 31), port=["Dubai", "Mumbai", "Singapore"], cargo=["empty", "full"])
 
 print(states)                  # StateSpace(day=30, port=3, cargo=2; size=180)
 print(states.dimension_names)  # ('day', 'port', 'cargo')
@@ -42,7 +42,7 @@ An edge goes from one state to another, has a cost, and optionally consumes
 [resources](resources.md).
 
 ```python
-graph = cp.Graph(states=states)
+graph = cr.Graph(states=states)
 
 edge = graph.add_edge((1, "Dubai", "empty"), (2, "Dubai", "full"), cost=50.0)
 print(edge)   # 0, the id of the new edge
@@ -82,7 +82,7 @@ print(waiting)   # range(146, 175): the ids of the last batch
 If your vertices are already integers, skip the state space:
 
 ```python
-plain = cp.Graph(num_vertices=4)
+plain = cr.Graph(num_vertices=4)
 plain.add_edge(0, 1, cost=2.0)
 plain.add_edge(1, 3, cost=-1.0)
 ```
@@ -121,8 +121,8 @@ boolean `solution.found`.
 | `unreachable` | no path leads from source to target |
 | `infeasible` | paths exist, but none respects the resource limits |
 
-`cp.shortest_path(network, source, target)` and
-`cp.resource_shortest_path(network, source, target)` are the same solvers as
+`cr.shortest_path(network, source, target)` and
+`cr.resource_shortest_path(network, source, target)` are the same solvers as
 plain functions.
 
 ### New costs on the same network
@@ -145,7 +145,7 @@ makes negative costs safe. `compile()` detects cycles, and the network tells
 you where:
 
 ```python
-loop = cp.Graph(num_vertices=3)
+loop = cr.Graph(num_vertices=3)
 loop.add_edge(0, 1, cost=1.0)
 loop.add_edge(1, 2, cost=1.0)
 loop.add_edge(2, 0, cost=1.0)

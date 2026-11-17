@@ -6,11 +6,11 @@ import numpy as np
 import pytest
 import scipy.sparse as sp
 
-import celerispath as cp
+import celerisroute as cr
 from _reference import Instance, check_path, enumerate_paths, random_dag
 from test_pricing import random_duals, random_matrix
 
-SCHEDULERS = ["threads"] + (["tbb"] if cp.tbb_available() else [])
+SCHEDULERS = ["threads"] + (["tbb"] if cr.tbb_available() else [])
 COST_UPDATES = ["shared_sparse", "indexed", "per_vessel"]
 
 
@@ -22,7 +22,7 @@ class Case:
     """A random fleet together with everything needed to price it by hand."""
 
     instance: Instance
-    network: cp.Network
+    network: cr.Network
     matrix: np.ndarray  # shared coefficients, dense (K, E)
     duals: np.ndarray
     source: np.ndarray
@@ -38,10 +38,10 @@ class Case:
     def num_vessels(self) -> int:
         return int(self.source.shape[0])
 
-    def fleet(self, algorithm="rcsp", **options) -> cp.PricingFleet:
+    def fleet(self, algorithm="rcsp", **options) -> cr.PricingFleet:
         if algorithm == "dag" and self.instance.upper:
             options.setdefault("unconstrained", True)  # ignore the bounds on purpose
-        fleet = cp.PricingFleet(
+        fleet = cr.PricingFleet(
             self.network, sp.csr_array(self.matrix), algorithm=algorithm, **options
         )
         self.add_to(fleet, algorithm)
@@ -153,7 +153,7 @@ def make_case(seed: int, num_vessels: int = 24, num_resources: int = 2, overlays
                 coefficients)
 
 
-def check_against_reference(case: Case, result: cp.FleetResult, algorithm: str = "rcsp",
+def check_against_reference(case: Case, result: cr.FleetResult, algorithm: str = "rcsp",
                             max_paths: int = 1, negative_only: bool = False) -> None:
     assert result.vessel_ids == tuple(f"v{v}" for v in range(case.num_vessels))
     assert result.all_priced_exactly
@@ -189,7 +189,7 @@ def check_against_reference(case: Case, result: cp.FleetResult, algorithm: str =
     assert seen == result.num_columns == len(result.columns)
 
 
-def snapshot(result: cp.FleetResult):
+def snapshot(result: cr.FleetResult):
     """Everything observable about a fleet result except its timings."""
     stats = result.statistics
     return (
@@ -263,7 +263,7 @@ def test_fleet_agrees_with_one_pricing_engine_per_vessel(algorithm):
     fleet = case.fleet(algorithm=algorithm)
     result = fleet.price(case.duals, negative_only=False)
     for v in range(case.num_vessels):
-        engine = cp.PricingEngine(
+        engine = cr.PricingEngine(
             case.network, int(case.source[v]), int(case.target[v]),
             dual_matrix=sp.csr_array(case.matrix), algorithm=algorithm,
             unconstrained=algorithm == "dag",
@@ -292,7 +292,7 @@ def test_negative_only_keeps_the_certificate():
 
     # Duals of zero and costs shifted to be positive: nothing improves, and
     # the empty result is a certificate because every vessel was priced.
-    quiet = cp.PricingFleet(case.network, num_constraints=0)
+    quiet = cr.PricingFleet(case.network, num_constraints=0)
     quiet.add_vessels(source=case.source, target=case.target,
                       fixed_cost=np.full(case.num_vessels, 1000.0))
     result = quiet.price([])
@@ -302,9 +302,9 @@ def test_negative_only_keeps_the_certificate():
 
 
 def test_tolerance_decides_what_counts_as_negative():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 1.0)
-    fleet = cp.PricingFleet(graph.compile(), sp.csr_array(np.array([[1.0]])))
+    fleet = cr.PricingFleet(graph.compile(), sp.csr_array(np.array([[1.0]])))
     fleet.add_vessels(source=0, target=1)
     assert fleet.price([1.5]).num_columns == 1
     result = fleet.price([1.5], tolerance=0.75)
@@ -392,7 +392,7 @@ def test_results_follow_registration_order_and_ids():
 def test_vessels_can_be_added_between_solves():
     case = make_case(9, num_vessels=30)
     whole = snapshot(case.fleet().price(case.duals, negative_only=False))
-    fleet = cp.PricingFleet(case.network, sp.csr_array(case.matrix), algorithm="rcsp", threads=3)
+    fleet = cr.PricingFleet(case.network, sp.csr_array(case.matrix), algorithm="rcsp", threads=3)
     assert case.add_to(fleet, vessels=range(0, 12)) == range(0, 12)
     assert not fleet.is_prepared
     assert fleet.prepare() is fleet and fleet.is_prepared
@@ -406,7 +406,7 @@ def test_vessels_can_be_added_between_solves():
 
 def test_an_empty_fleet_prices_to_an_empty_result():
     case = make_case(0)
-    fleet = cp.PricingFleet(case.network, sp.csr_array(case.matrix))
+    fleet = cr.PricingFleet(case.network, sp.csr_array(case.matrix))
     result = fleet.price(case.duals)
     assert result.num_vessels == 0 and result.num_columns == 0
     assert result.best_reduced_cost == math.inf and result.converged
@@ -416,11 +416,11 @@ def test_an_empty_fleet_prices_to_an_empty_result():
 # ------------------------------------------------------------ vessel profiles
 
 
-def chain(num_edges: int = 4, fuel: float | None = None) -> cp.Network:
+def chain(num_edges: int = 4, fuel: float | None = None) -> cr.Network:
     """0 -> 1 -> ... with a parallel, dearer edge between each pair."""
-    graph = cp.Graph(num_vertices=num_edges + 1)
+    graph = cr.Graph(num_vertices=num_edges + 1)
     if fuel is not None:
-        graph.add_resource(cp.Resource("fuel", upper=fuel))
+        graph.add_resource(cr.Resource("fuel", upper=fuel))
     for v in range(num_edges):
         resources = None if fuel is None else {"fuel": 2.0}
         cheap = None if fuel is None else {"fuel": 1.0}
@@ -431,7 +431,7 @@ def chain(num_edges: int = 4, fuel: float | None = None) -> cp.Network:
 
 def test_cost_offsets_masks_and_forbidden_edges():
     network = chain()
-    fleet = cp.PricingFleet(network, num_constraints=0)
+    fleet = cr.PricingFleet(network, num_constraints=0)
     mask = np.ones((5, network.num_edges), dtype=bool)
     mask[3, [0, 2]] = False
     mask[4, [6, 7]] = False
@@ -462,13 +462,13 @@ def test_offset_formats_agree_and_duplicates_add_up():
     results = []
     for offsets in (dense, sp.csr_array(dense), sp.coo_array(dense), [{0: 7.0}, {2: math.inf}],
                     [dense[0], dense[1]]):
-        fleet = cp.PricingFleet(network, num_constraints=0)
+        fleet = cr.PricingFleet(network, num_constraints=0)
         fleet.add_vessels(source=0, target=4, cost_offsets=offsets)
         results.append(snapshot(fleet.price([], negative_only=False)))
     assert all(result == results[0] for result in results)
     assert results[0][5] == [8.0, 8.0]  # original costs: 0 -> 1 by edge 1, and 1 -> 2 by edge 3
 
-    fleet = cp.PricingFleet(network, num_constraints=0)
+    fleet = cr.PricingFleet(network, num_constraints=0)
     twice = sp.coo_array(([1.5, 1.5], ([0, 0], [0, 0])), shape=(1, network.num_edges))
     fleet.add_vessels(source=0, target=4, cost_offsets=twice, forbidden_edges=[[1, 1]])
     assert fleet.price([], negative_only=False).original_costs.tolist() == [7.0]
@@ -476,7 +476,7 @@ def test_offset_formats_agree_and_duplicates_add_up():
 
 def test_per_vessel_resource_limits():
     network = chain(fuel=8.0)  # all cheap edges need 8 fuel, all dear ones 4
-    fleet = cp.PricingFleet(network, num_constraints=0)
+    fleet = cr.PricingFleet(network, num_constraints=0)
     assert fleet.algorithm == "rcsp"
     fleet.add_vessels(source=0, target=4,
                       resource_limits={"fuel": [8.0, 6.0, 4.0, 3.0, math.inf, 100.0]})
@@ -499,7 +499,7 @@ def test_vessel_specific_coefficients_and_fixed_parts():
     shared = sp.csr_array(np.array([[1.0, 0, 0, 0], [0, 0, 1.0, 0], [0, 0, 0, 0]]))
     extra = sp.csr_array(np.array([[0, 0, 0, 0], [0, 0, 2.0, 0], [0, 3.0, 0, 0]]))
     for cost_update in COST_UPDATES:
-        fleet = cp.PricingFleet(network, shared, cost_update=cost_update)
+        fleet = cr.PricingFleet(network, shared, cost_update=cost_update)
         fleet.add_vessels(
             ids=["shared", "own"], source=0, target=2,
             edge_coefficients={1: extra},
@@ -523,7 +523,7 @@ def test_vessel_specific_coefficients_and_fixed_parts():
 
 def test_cancelling_coefficients_are_dropped_from_columns():
     network = chain(1)
-    fleet = cp.PricingFleet(network, sp.csr_array(np.array([[1.0, 0.0], [1.0, 0.0]])))
+    fleet = cr.PricingFleet(network, sp.csr_array(np.array([[1.0, 0.0], [1.0, 0.0]])))
     fleet.add_vessels(source=0, target=1,
                       edge_coefficients=[sp.csr_array(np.array([[-1.0, 0.0], [0.0, 0.0]]))])
     column = fleet.price([100.0, 1.0], negative_only=False).columns[0]
@@ -533,13 +533,13 @@ def test_cancelling_coefficients_are_dropped_from_columns():
 
 
 def test_sources_and_targets_accept_states_ids_and_scalars():
-    graph = cp.Graph(states=cp.StateSpace(day=range(3), port=["A", "B", "C"]))
+    graph = cr.Graph(states=cr.StateSpace(day=range(3), port=["A", "B", "C"]))
     graph.add_edge((0, "A"), (1, "B"), 1.0)
     graph.add_edge((1, "B"), (2, "C"), 1.0)
     graph.add_edge((0, "A"), (2, "C"), 5.0)
     network = graph.compile()
     a, b, c = (network.node_id(state) for state in [(0, "A"), (1, "B"), (2, "C")])
-    fleet = cp.PricingFleet(network, num_constraints=0)
+    fleet = cr.PricingFleet(network, num_constraints=0)
     fleet.add_vessels(source=[(0, "A"), (1, "B")], target=[(2, "C"), (2, "C")])
     fleet.add_vessels(source=a, target=np.array([b, c]))
     fleet.add_vessels(source=a, target=a)  # a vessel that stays where it is
@@ -564,7 +564,7 @@ def test_indexed_duals_match_the_sparse_matrix():
     num_edges = case.instance.num_edges
     row = rng.integers(-1, 7, size=(num_edges, 3))
     coefficient = rng.integers(-2, 3, size=(num_edges, 3)).astype(np.float64)
-    mapping = cp.IndexedDuals(row, coefficient, num_constraints=7)
+    mapping = cr.IndexedDuals(row, coefficient, num_constraints=7)
     assert (mapping.num_edges, mapping.width, mapping.num_constraints) == (num_edges, 3, 7)
     dense = np.zeros((7, num_edges))
     for edge in range(num_edges):
@@ -576,7 +576,7 @@ def test_indexed_duals_match_the_sparse_matrix():
 
     reference = snapshot(case.fleet(threads=1).price(case.duals, negative_only=False))
     for cost_update in (None, "auto", *COST_UPDATES):
-        fleet = cp.PricingFleet(case.network, dual_mapping=mapping, algorithm="rcsp",
+        fleet = cr.PricingFleet(case.network, dual_mapping=mapping, algorithm="rcsp",
                                 cost_update=cost_update)
         expected = "indexed" if cost_update in (None, "auto") else cost_update
         assert fleet.cost_update == expected
@@ -590,11 +590,11 @@ def test_indexed_duals_match_the_sparse_matrix():
 def test_port_time_product_duals():
     # Two ports, three days, two products; every edge discharges at one
     # (port, day, product), edge 3 is ballast.
-    graph = cp.Graph(num_vertices=4)
+    graph = cr.Graph(num_vertices=4)
     for u, v in [(0, 1), (0, 2), (1, 3), (2, 3)]:
         graph.add_edge(u, v, 10.0)
     network = graph.compile()
-    mapping = cp.PortTimeProductDuals(
+    mapping = cr.PortTimeProductDuals(
         port=[0, 1, 1, -1], day=[0, 1, 2, 0], product=[1, 0, 1, 0],
         quantity=[5.0, 2.0, 1.0, 9.0], shape=(2, 3, 2), extra_constraints=1,
     )
@@ -615,7 +615,7 @@ def test_port_time_product_duals():
     with pytest.raises(ValueError, match="shape"):
         mapping.flatten(np.zeros((3, 2, 2)), extra=[0.0])
 
-    fleet = cp.PricingFleet(network, dual_mapping=mapping)
+    fleet = cr.PricingFleet(network, dual_mapping=mapping)
     assert fleet.cost_update == "indexed" and fleet.num_constraints == 13
     fleet.add_vessels(ids=["a", "b"], source=0, target=3,
                       fixed_coefficients=[{12: 1.0}, None])
@@ -626,10 +626,10 @@ def test_port_time_product_duals():
     assert b.reduced_cost == 12.0 and a.reduced_cost == 12.0 - 6.0
     assert a.dense_coefficients()[12] == 1.0
 
-    plain = cp.PortTimeProductDuals(port=[0, 1, 1, -1], day=[0, 1, 2, 0], product=[1, 0, 1, 0],
+    plain = cr.PortTimeProductDuals(port=[0, 1, 1, -1], day=[0, 1, 2, 0], product=[1, 0, 1, 0],
                                     quantity=[5.0, 2.0, 1.0, 9.0])
     assert plain.shape == (2, 3, 2) and plain.extra_constraints == 0
-    fleet = cp.PricingFleet(network, dual_mapping=plain, cost_update="shared_sparse")
+    fleet = cr.PricingFleet(network, dual_mapping=plain, cost_update="shared_sparse")
     fleet.add_vessels(source=0, target=3)
     assert fleet.price(duals, negative_only=False).reduced_costs.tolist() == [12.0]  # 3-d duals
     fleet.update_duals(duals.ravel())
@@ -638,20 +638,20 @@ def test_port_time_product_duals():
 
 def test_indexed_duals_validation():
     with pytest.raises(TypeError, match="integer"):
-        cp.IndexedDuals([0.5, 1.0])
+        cr.IndexedDuals([0.5, 1.0])
     with pytest.raises(ValueError, match="num_constraints"):
-        cp.IndexedDuals([0, 4], num_constraints=4)
+        cr.IndexedDuals([0, 4], num_constraints=4)
     with pytest.raises(ValueError, match="does not match"):
-        cp.IndexedDuals([0, 1, 2], [1.0, 2.0])
+        cr.IndexedDuals([0, 1, 2], [1.0, 2.0])
     with pytest.raises(ValueError, match="NaN"):
-        cp.IndexedDuals([0, 1], [1.0, math.nan])
-    assert cp.IndexedDuals([0, -1], [1.0, math.nan]).num_constraints == 1  # unused pair
+        cr.IndexedDuals([0, 1], [1.0, math.nan])
+    assert cr.IndexedDuals([0, -1], [1.0, math.nan]).num_constraints == 1  # unused pair
     with pytest.raises(ValueError, match="same shape"):
-        cp.PortTimeProductDuals([0, 1], [0], [0, 0])
+        cr.PortTimeProductDuals([0, 1], [0], [0, 0])
     with pytest.raises(ValueError, match="outside the shape"):
-        cp.PortTimeProductDuals([0, 2], [0, 0], [0, 0], shape=(2, 1, 1))
+        cr.PortTimeProductDuals([0, 2], [0, 0], [0, 0], shape=(2, 1, 1))
     with pytest.raises(ValueError, match="extra_constraints"):
-        cp.PortTimeProductDuals([0], [0], [0], extra_constraints=-1)
+        cr.PortTimeProductDuals([0], [0], [0], extra_constraints=-1)
 
 
 # ------------------------------------- interruption, cancellation and failures
@@ -675,12 +675,12 @@ def heavy_fleet(num_vessels: int = 400, threads: int = 4, scheduler: str = "auto
         source.append(1 + (layers - 1) * width + j)
         target.append(num_vertices - 1)
     num_edges = len(source)
-    graph = cp.Graph(num_vertices=num_vertices)
-    graph.add_resource(cp.Resource("a", upper=27.5))
-    graph.add_resource(cp.Resource("b", upper=27.5))
+    graph = cr.Graph(num_vertices=num_vertices)
+    graph.add_resource(cr.Resource("a", upper=27.5))
+    graph.add_resource(cr.Resource("b", upper=27.5))
     graph.add_edges(np.array(source), np.array(target), rng.uniform(1, 9, num_edges),
                     resources={"a": rng.uniform(0, 5, num_edges), "b": rng.uniform(0, 5, num_edges)})
-    fleet = cp.PricingFleet(graph.compile(), num_constraints=0, threads=threads,
+    fleet = cr.PricingFleet(graph.compile(), num_constraints=0, threads=threads,
                             scheduler=scheduler)
     fleet.add_vessels(source=np.zeros(num_vessels, dtype=np.int64), target=num_vertices - 1)
     return fleet
@@ -760,10 +760,10 @@ def test_a_failing_vessel_is_reported_and_the_fleet_survives(scheduler):
     fleet = case.fleet(scheduler=scheduler, threads=4)
     expected = snapshot(fleet.price(case.duals, negative_only=False))
     fleet._core.debug_fail_vessel(5)
-    with pytest.raises(cp.BatchPricingError, match="1 of 24 vessels failed: vessel 'v5'") as info:
+    with pytest.raises(cr.BatchPricingError, match="1 of 24 vessels failed: vessel 'v5'") as info:
         fleet.price(case.duals, negative_only=False)
     assert list(info.value.errors) == [5] and info.value.errors[5]
-    with pytest.raises(cp.BatchPricingError):
+    with pytest.raises(cr.BatchPricingError):
         fleet.solve()
     fleet._core.debug_fail_vessel(-1)
     assert snapshot(fleet.price(case.duals, negative_only=False)) == expected
@@ -803,49 +803,49 @@ def test_concurrent_calls_on_one_fleet_are_serialised():
 def test_invalid_fleet_construction():
     case = make_case(0)
     network, matrix = case.network, sp.csr_array(case.matrix)
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 1.0)
     with pytest.raises(TypeError, match="compile"):
-        cp.PricingFleet(graph)
+        cr.PricingFleet(graph)
     with pytest.raises(TypeError):
-        cp.PricingFleet("network")
+        cr.PricingFleet("network")
     with pytest.raises(ValueError, match="not both"):
-        cp.PricingFleet(network, matrix, dual_mapping=cp.IndexedDuals(np.zeros(54, dtype=int)))
+        cr.PricingFleet(network, matrix, dual_mapping=cr.IndexedDuals(np.zeros(54, dtype=int)))
     with pytest.raises(ValueError, match="edges"):
-        cp.PricingFleet(network, dual_mapping=cp.IndexedDuals([0, 1]))
+        cr.PricingFleet(network, dual_mapping=cr.IndexedDuals([0, 1]))
     with pytest.raises(TypeError, match="IndexedDuals"):
-        cp.PricingFleet(network, dual_mapping=matrix)
+        cr.PricingFleet(network, dual_mapping=matrix)
     with pytest.raises(ValueError):
-        cp.PricingFleet(network, sp.csr_array((3, 5)))
+        cr.PricingFleet(network, sp.csr_array((3, 5)))
     with pytest.raises(ValueError, match="num_constraints"):
-        cp.PricingFleet(network, matrix, num_constraints=3)
+        cr.PricingFleet(network, matrix, num_constraints=3)
     for options in ({"scheduler": "openmp"}, {"partitioner": "affinity"},
                     {"cost_update": "dense"}, {"threads": 0}, {"threads": "many"},
                     {"dominance_tolerance": -1.0}, {"bound_cache_bytes": -1},
                     {"algorithm": "dijkstra"}):
         with pytest.raises(ValueError):
-            cp.PricingFleet(network, matrix, **options)
+            cr.PricingFleet(network, matrix, **options)
     with pytest.raises(TypeError):
-        cp.PricingFleet(network, matrix, threads=2.5)
-    if not cp.tbb_available():
+        cr.PricingFleet(network, matrix, threads=2.5)
+    if not cr.tbb_available():
         with pytest.raises(RuntimeError, match="oneTBB"):
-            cp.PricingFleet(network, matrix, scheduler="tbb")
-        assert cp.tbb_version() is None
-        assert cp.PricingFleet(network, matrix).scheduler == "threads"
+            cr.PricingFleet(network, matrix, scheduler="tbb")
+        assert cr.tbb_version() is None
+        assert cr.PricingFleet(network, matrix).scheduler == "threads"
     else:
-        assert cp.tbb_version()
-        assert cp.PricingFleet(network, matrix).scheduler == "tbb"
-    fleet = cp.PricingFleet(network, matrix, threads=None)
+        assert cr.tbb_version()
+        assert cr.PricingFleet(network, matrix).scheduler == "tbb"
+    fleet = cr.PricingFleet(network, matrix, threads=None)
     assert fleet.threads >= 1 and fleet.num_constraints == 7
     assert "PricingFleet(vessels=0" in repr(fleet)
 
 
 def test_cyclic_networks_are_rejected():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 1, 1.0)
     graph.add_edge(1, 0, 1.0)
-    with pytest.raises(cp.CyclicGraphError):
-        cp.PricingFleet(graph.compile(), num_constraints=0)
+    with pytest.raises(cr.CyclicGraphError):
+        cr.PricingFleet(graph.compile(), num_constraints=0)
 
 
 def test_invalid_vessels_leave_the_fleet_unchanged():
@@ -856,8 +856,8 @@ def test_invalid_vessels_leave_the_fleet_unchanged():
     two = {"source": [0, 1], "target": [2, 3]}
     bad = [
         ({"source": [0, 1], "target": [2, 3, 4]}, ValueError),
-        ({"source": [0, 99], "target": [2, 3]}, cp.InvalidStateError),
-        ({"source": np.array([0, -1]), "target": [2, 3]}, cp.InvalidStateError),
+        ({"source": [0, 99], "target": [2, 3]}, cr.InvalidStateError),
+        ({"source": np.array([0, -1]), "target": [2, 3]}, cr.InvalidStateError),
         ({"source": 0}, TypeError),
         ({**two, "ids": ["v0", "new"]}, ValueError),            # v0 exists
         ({**two, "ids": ["same", "same"]}, ValueError),
@@ -897,11 +897,11 @@ def test_invalid_vessels_leave_the_fleet_unchanged():
 
 
 def test_untracked_resources_cannot_be_limited_per_vessel():
-    graph = cp.Graph(num_vertices=2)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
-    graph.add_resource(cp.Resource("distance"))
+    graph = cr.Graph(num_vertices=2)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
+    graph.add_resource(cr.Resource("distance"))
     graph.add_edge(0, 1, 1.0, {"fuel": 1.0, "distance": 9.0})
-    fleet = cp.PricingFleet(graph.compile(), num_constraints=0)
+    fleet = cr.PricingFleet(graph.compile(), num_constraints=0)
     with pytest.raises(ValueError, match="finite upper"):
         fleet.add_vessels(source=0, target=1, resource_limits={"distance": 3.0})
     fleet.add_vessels(source=0, target=1, resource_limits={"fuel": 2.0})
@@ -952,7 +952,7 @@ def test_results_are_read_only_views():
 def test_memory_grows_with_overlays_not_with_vessels():
     case = make_case(0)
     num_edges = case.instance.num_edges
-    fleet = cp.PricingFleet(case.network, sp.csr_array(case.matrix), threads=2).prepare()
+    fleet = cr.PricingFleet(case.network, sp.csr_array(case.matrix), threads=2).prepare()
     fleet.update_duals(case.duals)
     empty = fleet.memory
     assert set(empty) == {"shared_graph", "shared_pricing", "vessels", "bound_cache",

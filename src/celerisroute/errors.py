@@ -1,8 +1,8 @@
-"""Exception types raised by celerispath.
+"""Exception types raised by celerisroute.
 
 Each one also derives from the built-in exception a caller would naturally
 catch (``ValueError``, ``RuntimeError``), so ``except ValueError`` keeps
-working while ``except celerispath.CelerisPathError`` catches everything specific
+working while ``except celerisroute.CelerisRouteError`` catches everything specific
 to this library.
 """
 
@@ -10,18 +10,18 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-__all__ = ["BatchPricingError", "CyclicGraphError", "InvalidStateError", "CelerisPathError"]
+__all__ = ["BatchPricingError", "CyclicGraphError", "InvalidStateError", "CelerisRouteError"]
 
 
-class CelerisPathError(Exception):
-    """Base class of all celerispath-specific errors."""
+class CelerisRouteError(Exception):
+    """Base class of all celerisroute-specific errors."""
 
 
-class InvalidStateError(CelerisPathError, ValueError):
+class InvalidStateError(CelerisRouteError, ValueError):
     """A state (or vertex id) does not belong to the state space or graph."""
 
 
-class CyclicGraphError(CelerisPathError, ValueError):
+class CyclicGraphError(CelerisRouteError, ValueError):
     """A solver was asked to run on a graph that contains a directed cycle.
 
     ``cycle`` holds one witness cycle as a list of vertex ids
@@ -33,7 +33,7 @@ class CyclicGraphError(CelerisPathError, ValueError):
         self.cycle: list[int] = list(cycle or [])
 
 
-class BatchPricingError(CelerisPathError, RuntimeError):
+class BatchPricingError(CelerisRouteError, RuntimeError):
     """One or more engines of a batch failed.
 
     ``errors`` maps the index of every failing engine (its position in the

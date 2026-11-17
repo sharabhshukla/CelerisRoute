@@ -2,12 +2,12 @@
 
 One-off solves and what they return. `Network.solve` is documented with [`Network`](modelling.md).
 
-::: celerispath.solvers.shortest_path
+::: celerisroute.solvers.shortest_path
 
-::: celerispath.solvers.resource_shortest_path
+::: celerisroute.solvers.resource_shortest_path
 
-::: celerispath.results.Solution
+::: celerisroute.results.Solution
 
-::: celerispath.results.SolveStatistics
+::: celerisroute.results.SolveStatistics
 
-::: celerispath.results.Status
+::: celerisroute.results.Status

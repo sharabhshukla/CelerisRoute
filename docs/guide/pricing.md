@@ -3,11 +3,11 @@
 Column generation solves a large linear program by keeping only a few of its
 columns and asking a *pricing problem* for more. When a column is a path in a
 network, the pricing problem is a shortest path with edge costs reduced by the
-duals of the master. CelerisPath is built for exactly this loop.
+duals of the master. CelerisRoute is built for exactly this loop.
 
 ```mermaid
 flowchart LR
-    M["Restricted master LP<br/>(your LP solver)"] -- "duals π" --> P["Pricing<br/>(CelerisPath)"]
+    M["Restricted master LP<br/>(your LP solver)"] -- "duals π" --> P["Pricing<br/>(CelerisRoute)"]
     P -- "columns with<br/>negative reduced cost" --> M
     P -- "none left" --> D(["LP optimal"])
 ```
@@ -39,11 +39,11 @@ engine finds the path with the smallest reduced cost.
 
 ```python
 import numpy as np
-import celerispath as cp
+import celerisroute as cr
 
-states = cp.StateSpace(day=range(1, 4), port=["A", "B"])
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=10))
+states = cr.StateSpace(day=range(1, 4), port=["A", "B"])
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=10))
 graph.add_edge((1, "A"), (2, "A"), cost=1, resources={"fuel": 1})   # edge 0
 graph.add_edge((1, "A"), (2, "B"), cost=5, resources={"fuel": 6})   # edge 1
 graph.add_edge((2, "A"), (3, "B"), cost=9, resources={"fuel": 6})   # edge 2
@@ -53,7 +53,7 @@ network = graph.compile()
 # One master row: "arrive at B on day 3". Edges 2 and 3 do that.
 A = np.array([[0.0, 0.0, 1.0, 1.0]])
 
-engine = cp.PricingEngine(network, (1, "A"), (3, "B"), dual_matrix=A)
+engine = cr.PricingEngine(network, (1, "A"), (3, "B"), dual_matrix=A)
 ```
 
 `A` has one row per master constraint and one column per edge. Dense arrays
@@ -135,7 +135,7 @@ convexity row, "each vessel sails exactly one route", where every route of
 that vessel has coefficient 1. Give those to the engine as fixed terms:
 
 ```py
-engine = cp.PricingEngine(
+engine = cr.PricingEngine(
     network, source, target,
     dual_matrix=A,
     fixed_cost=40.0,                          # added to every column's cost
@@ -152,7 +152,7 @@ On an unconstrained network the engine can return the `k` cheapest distinct
 paths in one call, a cheap way to add several columns per iteration:
 
 ```py
-engine = cp.PricingEngine(network, source, target, algorithm="dag", dual_matrix=A)
+engine = cr.PricingEngine(network, source, target, algorithm="dag", dual_matrix=A)
 result = engine.solve(duals, max_paths=5)
 ```
 
@@ -164,7 +164,7 @@ A fleet with three vessel types has three pricing problems per iteration.
 `BatchPricingEngine` solves them on native threads with the GIL released:
 
 ```py
-batch = cp.BatchPricingEngine([engine_a, engine_b, engine_c])
+batch = cr.BatchPricingEngine([engine_a, engine_b, engine_c])
 results = batch.solve_batch(duals)        # results[i] belongs to engines[i]
 ```
 

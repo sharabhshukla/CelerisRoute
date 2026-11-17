@@ -1,4 +1,4 @@
-#include "celerispath/pricing_fleet.hpp"
+#include "celerisroute/pricing_fleet.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <utility>
 
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
 #include <oneapi/tbb/blocked_range.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <oneapi/tbb/partitioner.h>
@@ -21,7 +21,7 @@
 #include <oneapi/tbb/version.h>
 #endif
 
-namespace celerispath {
+namespace celerisroute {
 
 namespace {
 
@@ -97,7 +97,7 @@ struct OverlayEntry {
 }  // namespace
 
 bool tbb_available() {
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
     return true;
 #else
     return false;
@@ -105,7 +105,7 @@ bool tbb_available() {
 }
 
 std::string tbb_runtime_version() {
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
     return TBB_runtime_version();
 #else
     return "";
@@ -234,7 +234,7 @@ public:
 
     Executor(Scheduler scheduler, Partitioner partitioner, unsigned threads)
         : partitioner_(partitioner), slots_(threads) {
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
         if (scheduler == Scheduler::Tbb && threads > 1) {
             // One slot is reserved for the calling thread, which takes part
             // in the work; the other threads - 1 are oneTBB workers that stay
@@ -252,7 +252,7 @@ public:
 
     // Whether workers outlive a run, which makes short runs worthwhile.
     bool persistent() const {
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
         return arena_ != nullptr;
 #else
         return false;
@@ -269,7 +269,7 @@ public:
             }
             return;
         }
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
         if (arena_ != nullptr) {
             run_tbb(count, body);
             return;
@@ -279,7 +279,7 @@ public:
     }
 
 private:
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
     void run_tbb(std::size_t count, const Body& body) {
         // Isolated, so cancelling this run never reaches a task group of the
         // caller (and the other way round).
@@ -358,7 +358,7 @@ private:
 
     [[maybe_unused]] Partitioner partitioner_;  // only read by the oneTBB scheduler
     unsigned slots_;
-#if CELERISPATH_HAS_TBB
+#if CELERISROUTE_HAS_TBB
     std::unique_ptr<tbb::task_arena> arena_;
 #endif
 };
@@ -380,7 +380,7 @@ PricingFleet::PricingFleet(std::shared_ptr<const CompiledGraph> graph,
         throw std::invalid_argument("dominance_tolerance must be nonnegative");
     }
     if (options_.scheduler == Scheduler::Tbb && !tbb_available()) {
-        throw std::invalid_argument("this build of celerispath has no oneTBB support; use the "
+        throw std::invalid_argument("this build of celerisroute has no oneTBB support; use the "
                                     "\"threads\" scheduler or rebuild with oneTBB installed");
     }
 
@@ -1284,4 +1284,4 @@ FleetMemory PricingFleet::memory() const {
     return memory;
 }
 
-}  // namespace celerispath
+}  // namespace celerisroute

@@ -1,14 +1,14 @@
 /* Landing page hero */
-.cp-hero {
+.cr-hero {
   text-align: center;
   padding: 1.5rem 0 0.5rem;
 }
-.cp-hero h1 {
+.cr-hero h1 {
   font-size: 2.6rem;
   font-weight: 700;
   margin-bottom: 0.4rem;
 }
-.cp-hero p.cp-tagline {
+.cr-hero p.cr-tagline {
   font-size: 1.15rem;
   color: var(--md-default-fg-color--light);
   max-width: 40rem;

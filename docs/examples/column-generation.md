@@ -2,7 +2,7 @@
 
 A complete column-generation loop in about 150 lines. Three vessels have to
 serve five delivery contracts, and a contract that nobody serves costs a
-penalty. The master problem chooses routes; CelerisPath invents them.
+penalty. The master problem chooses routes; CelerisRoute invents them.
 
 Each vessel gets a `PricingEngine`, and a `BatchPricingEngine` prices all of
 them in one call. The master is solved with SciPy's HiGHS interface, so the
@@ -75,4 +75,4 @@ The LP optimum of 1061 is the same on every machine. The rounds in between
 can differ with the SciPy version, because an LP usually has several optimal
 dual solutions and the solver may return any of them.
 
-[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/column_generation.py){ .md-button }
+[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisRoute/blob/main/examples/column_generation.py){ .md-button }

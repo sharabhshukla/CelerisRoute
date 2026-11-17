@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace celerispath {
+namespace celerisroute {
 
 class LabelPool {
 public:
@@ -164,4 +164,4 @@ struct PoolAllocator {
     }
 };
 
-}  // namespace celerispath
+}  // namespace celerisroute

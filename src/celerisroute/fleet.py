@@ -1,6 +1,6 @@
 """Fleet pricing: many pricing subproblems ("vessels") on one shared network.
 
-A ``celerispath.PricingEngine`` owns a pruned copy of the network for
+A ``celerisroute.PricingEngine`` owns a pruned copy of the network for
 its own source and target. A ``PricingFleet`` is the opposite trade: it
 keeps one network, one coefficient mapping and one array of reduced edge
 costs in native memory, shares them between all vessels, and describes each
@@ -18,7 +18,7 @@ One column-generation iteration is then two native steps, or one fused call:
 With ``A`` the shared coefficient matrix, ``B_v`` the optional coefficients
 of vessel ``v`` and ``offset_v`` its optional cost offsets, the reduced cost
 of edge ``e`` for vessel ``v`` is (sign convention of
-``celerispath.pricing``):
+``celerisroute.pricing``):
 
     reduced_v[e] = cost[e] + offset_v[e] - sum_k pi[k] * (A[k, e] + B_v[k, e])
 
@@ -75,7 +75,7 @@ _EMPTY_VALUE = np.empty(0, dtype=np.float64)
 
 
 def tbb_available() -> bool:
-    """Whether this build of celerispath can schedule fleets with oneTBB."""
+    """Whether this build of celerisroute can schedule fleets with oneTBB."""
     return bool(_core.tbb_available())
 
 
@@ -730,7 +730,7 @@ class PricingFleet:
     """Prices many vessels on one shared network, in parallel, in one call.
 
 
-        fleet = cp.PricingFleet(network, dual_matrix=A, algorithm="rcsp", threads="auto")
+        fleet = cr.PricingFleet(network, dual_matrix=A, algorithm="rcsp", threads="auto")
         fleet.add_vessels(ids=names, source=sources, target=targets,
                           resource_limits={"fuel": fuel_capacity})
         fleet.prepare()
@@ -747,7 +747,7 @@ class PricingFleet:
         A compiled ``Network``. It is shared, never copied.
     dual_matrix:
         Shared coefficients ``A`` of shape ``(num_constraints, num_edges)``,
-        as for ``celerispath.PricingEngine``.
+        as for ``celerisroute.PricingEngine``.
     dual_mapping:
         Alternative to ``dual_matrix``: an ``IndexedDuals`` (for example
         ``PortTimeProductDuals``) giving a fixed number of constraint
@@ -777,7 +777,7 @@ class PricingFleet:
         oneTBB range partitioner: ``"auto"`` (default), ``"simple"`` (one
         task per vessel) or ``"static"`` (even shares, no stealing).
     unconstrained, dominance_tolerance:
-        As for ``celerispath.PricingEngine``. A positive
+        As for ``celerisroute.PricingEngine``. A positive
         ``dominance_tolerance`` makes pricing heuristic, and results then
         never report ``FleetResult.converged``.
     num_constraints:
@@ -814,7 +814,7 @@ class PricingFleet:
         if isinstance(graph, Graph):
             raise TypeError("PricingFleet needs a compiled network: pass graph=my_graph.compile()")
         if not isinstance(graph, Network):
-            raise TypeError(f"graph must be a celerispath.Network, got {type(graph).__name__}")
+            raise TypeError(f"graph must be a celerisroute.Network, got {type(graph).__name__}")
         self._network = graph
         self._algorithm = graph._resolve_algorithm(algorithm, unconstrained)
         graph._require_acyclic()
@@ -827,7 +827,7 @@ class PricingFleet:
             )
         if scheduler == "tbb" and not tbb_available():
             raise RuntimeError(
-                "scheduler='tbb' was requested, but this build of celerispath has no oneTBB "
+                "scheduler='tbb' was requested, but this build of celerisroute has no oneTBB "
                 "support. Install oneTBB and rebuild, or use scheduler='threads'"
             )
         if partitioner not in _PARTITIONER_CODE:

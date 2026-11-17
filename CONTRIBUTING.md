@@ -1,17 +1,17 @@
 # Contributing
 
 Bug reports, questions and pull requests are welcome on
-[GitHub](https://github.com/sharabhshukla/CelerisPath).
+[GitHub](https://github.com/sharabhshukla/CelerisRoute).
 
 ## Development setup
 
 You need a C++20 compiler and the Boost headers (see the
-[installation guide](https://sharabhshukla.github.io/CelerisPath/getting-started/installation/)).
+[installation guide](https://sharabhshukla.github.io/CelerisRoute/getting-started/installation/)).
 oneTBB is optional.
 
 ```bash
-git clone https://github.com/sharabhshukla/CelerisPath
-cd CelerisPath
+git clone https://github.com/sharabhshukla/CelerisRoute
+cd CelerisRoute
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 python -m pytest
@@ -23,11 +23,11 @@ The editable install compiles the extension once. After changing C++ code, run
 ## Where things are
 
 ```text
-cpp/include/celerispath/   C++ headers of the solver core
+cpp/include/celerisroute/  C++ headers of the solver core
 cpp/src/                   C++ sources of the solver core
-cpp/bindings/python.cpp    nanobind module celerispath._core
+cpp/bindings/python.cpp    nanobind module celerisroute._core
 cpp/bench/                 native benchmark harness
-src/celerispath/           the Python package
+src/celerisroute/          the Python package
 tests/                     pytest suite
 examples/                  runnable scripts, also executed by the tests
 benchmarks/                benchmark scripts and their recorded results

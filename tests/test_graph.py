@@ -3,16 +3,16 @@ import math
 import numpy as np
 import pytest
 
-import celerispath as cp
+import celerisroute as cr
 
 
 @pytest.fixture
-def states() -> cp.StateSpace:
-    return cp.StateSpace(day=range(1, 6), port=["A", "B"])
+def states() -> cr.StateSpace:
+    return cr.StateSpace(day=range(1, 6), port=["A", "B"])
 
 
 def test_add_edge_returns_stable_consecutive_ids(states):
-    graph = cp.Graph(states=states, directed=True)
+    graph = cr.Graph(states=states, directed=True)
     assert graph.num_vertices == 10 and graph.num_edges == 0
     first = graph.add_edge((1, "A"), (2, "B"), cost=3.0)
     second = graph.add_edge(source=(2, "B"), target=(3, "A"), cost=-1.5)
@@ -26,7 +26,7 @@ def test_add_edge_returns_stable_consecutive_ids(states):
 
 
 def test_integer_and_state_endpoints_are_interchangeable(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge(states.id((1, "A")), (2, "B"), 1.0)
     graph.add_edge({"day": 2, "port": "B"}, states.id((3, "A")), 1.0)
     network = graph.compile()
@@ -35,7 +35,7 @@ def test_integer_and_state_endpoints_are_interchangeable(states):
 
 
 def test_graph_without_state_space():
-    graph = cp.Graph(num_vertices=4)
+    graph = cr.Graph(num_vertices=4)
     graph.add_edge(0, 1, 1.0)
     graph.add_edge(1, 3, 1.0)
     solution = graph.compile().solve(0, 3)
@@ -51,14 +51,14 @@ def test_bulk_edges_match_single_edges(states):
     cost = rng.normal(size=50)
     fuel = rng.uniform(0, 3, size=50)
 
-    bulk = cp.Graph(states=states)
-    bulk.add_resource(cp.Resource("fuel", upper=10.0))
+    bulk = cr.Graph(states=states)
+    bulk.add_resource(cr.Resource("fuel", upper=10.0))
     ids = bulk.add_edges(source=source, target=target, cost=cost, resources={"fuel": fuel})
     assert ids == range(0, 50)
     assert bulk.add_edges(source[:3], target[:3], cost[:3]) == range(50, 53)
 
-    single = cp.Graph(states=states)
-    single.add_resource(cp.Resource("fuel", upper=10.0))
+    single = cr.Graph(states=states)
+    single.add_resource(cr.Resource("fuel", upper=10.0))
     for s, t, c, f in zip(source.tolist(), target.tolist(), cost.tolist(), fuel.tolist()):
         single.add_edge(s, t, c, resources={"fuel": f})
     for s, t, c in zip(source[:3].tolist(), target[:3].tolist(), cost[:3].tolist()):
@@ -74,11 +74,11 @@ def test_bulk_edges_match_single_edges(states):
 
 
 def test_bulk_edges_accept_other_layouts_and_scalars():
-    graph = cp.Graph(num_vertices=6)
-    graph.add_resource(cp.Resource("time", upper=100.0))
+    graph = cr.Graph(num_vertices=6)
+    graph.add_resource(cr.Resource("time", upper=100.0))
     source = np.arange(10, dtype=np.int32)[::2]  # non-contiguous view, narrower dtype
     target = [1, 3, 5, 5, 5]
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edges(source, target, 1.0)  # ids 6 and 8 do not exist
     assert graph.num_edges == 0  # nothing was added
     ids = graph.add_edges(source[:3], target[:3], cost=2, resources={"time": 1.5})
@@ -89,9 +89,9 @@ def test_bulk_edges_accept_other_layouts_and_scalars():
 
 
 def test_compile_reports_structure(states):
-    graph = cp.Graph(states=states)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
-    graph.add_resource(cp.Resource("distance"))  # reported, not constraining
+    graph = cr.Graph(states=states)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
+    graph.add_resource(cr.Resource("distance"))  # reported, not constraining
     graph.add_edge((1, "A"), (2, "A"), 1.0, {"fuel": 1.0, "distance": 10.0})
     graph.add_edge((2, "A"), (3, "A"), 1.0, {"fuel": 1.0, "distance": 12.0})
     network = graph.compile()
@@ -114,7 +114,7 @@ def test_compile_reports_structure(states):
 
 
 def test_network_is_a_snapshot(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge((1, "A"), (2, "A"), 5.0)
     network = graph.compile()
     graph.add_edge((1, "A"), (2, "A"), 1.0)  # later edits do not leak into the snapshot
@@ -124,7 +124,7 @@ def test_network_is_a_snapshot(states):
 
 
 def test_exposed_arrays_are_read_only(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge((1, "A"), (2, "A"), 5.0)
     network = graph.compile()
     for array in (network.edge_source, network.edge_target, network.edge_cost):
@@ -136,7 +136,7 @@ def test_exposed_arrays_are_read_only(states):
 
 
 def test_with_costs_shares_topology(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge((1, "A"), (2, "A"), 5.0)
     graph.add_edge((1, "A"), (2, "A"), 6.0)
     network = graph.compile()
@@ -153,7 +153,7 @@ def test_with_costs_shares_topology(states):
 
 
 def test_cyclic_graph_is_rejected_by_the_solvers():
-    graph = cp.Graph(num_vertices=5)
+    graph = cr.Graph(num_vertices=5)
     graph.add_edge(0, 1, 1.0)
     graph.add_edge(1, 2, 1.0)
     graph.add_edge(2, 3, 1.0)
@@ -169,35 +169,35 @@ def test_cyclic_graph_is_rejected_by_the_solvers():
         assert (a, b) in edges
 
     for algorithm in ("auto", "dag", "rcsp"):
-        with pytest.raises(cp.CyclicGraphError, match="cycle") as info:
+        with pytest.raises(cr.CyclicGraphError, match="cycle") as info:
             network.solve(0, 4, algorithm=algorithm)
         assert sorted(info.value.cycle) == [1, 2, 3]
-    with pytest.raises(cp.CyclicGraphError):
-        cp.shortest_path(network, 0, 4)
-    with pytest.raises(cp.CyclicGraphError):
-        cp.resource_shortest_path(network, 0, 4)
-    with pytest.raises(cp.CyclicGraphError):
-        cp.PricingEngine(network, 0, 4)
-    with pytest.raises(cp.CyclicGraphError):
+    with pytest.raises(cr.CyclicGraphError):
+        cr.shortest_path(network, 0, 4)
+    with pytest.raises(cr.CyclicGraphError):
+        cr.resource_shortest_path(network, 0, 4)
+    with pytest.raises(cr.CyclicGraphError):
+        cr.PricingEngine(network, 0, 4)
+    with pytest.raises(cr.CyclicGraphError):
         network.topological_order
-    assert issubclass(cp.CyclicGraphError, ValueError)
+    assert issubclass(cr.CyclicGraphError, ValueError)
 
 
 def test_self_loop_is_a_cycle():
-    graph = cp.Graph(num_vertices=2)
+    graph = cr.Graph(num_vertices=2)
     graph.add_edge(0, 0, 1.0)
     graph.add_edge(0, 1, 1.0)
     network = graph.compile()
     assert network.find_cycle() == [0]
-    with pytest.raises(cp.CyclicGraphError):
+    with pytest.raises(cr.CyclicGraphError):
         network.solve(0, 1)
 
 
 def test_cycle_error_names_states(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge((1, "A"), (1, "B"), 0.0)
     graph.add_edge((1, "B"), (1, "A"), 0.0)
-    with pytest.raises(cp.CyclicGraphError, match=r"\(1, 'A'\)"):
+    with pytest.raises(cr.CyclicGraphError, match=r"\(1, 'A'\)"):
         graph.compile().solve((1, "A"), (1, "B"))
 
 
@@ -206,26 +206,26 @@ def test_cycle_error_names_states(states):
 
 def test_invalid_graph_construction(states):
     with pytest.raises(ValueError):
-        cp.Graph()
+        cr.Graph()
     with pytest.raises(NotImplementedError, match="undirected"):
-        cp.Graph(states=states, directed=False)
+        cr.Graph(states=states, directed=False)
     with pytest.raises(TypeError):
-        cp.Graph(states=[1, 2, 3])
+        cr.Graph(states=[1, 2, 3])
     with pytest.raises(ValueError):
-        cp.Graph(num_vertices=0)
+        cr.Graph(num_vertices=0)
     with pytest.raises(ValueError):
-        cp.Graph(states=states, num_vertices=3)
+        cr.Graph(states=states, num_vertices=3)
     with pytest.raises(TypeError):
-        cp.Graph(num_vertices=2.5)
+        cr.Graph(num_vertices=2.5)
 
 
 def test_invalid_single_edges(states):
-    graph = cp.Graph(states=states)
-    with pytest.raises(cp.InvalidStateError):
+    graph = cr.Graph(states=states)
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edge((1, "A"), (9, "A"), 1.0)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edge(0, 10, 1.0)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edge(-1, 0, 1.0)
     with pytest.raises(TypeError):
         graph.add_edge(0, 1, "cheap")
@@ -242,7 +242,7 @@ def test_invalid_single_edges(states):
 
 
 def test_invalid_bulk_edges():
-    graph = cp.Graph(num_vertices=4)
+    graph = cr.Graph(num_vertices=4)
     ok = np.array([0, 1])
     with pytest.raises(ValueError, match="same edges"):
         graph.add_edges(ok, np.array([1, 2, 3]), 1.0)
@@ -262,25 +262,25 @@ def test_invalid_bulk_edges():
         graph.add_edges(ok, ok + 1, np.array([1.0, np.inf]))
     with pytest.raises(ValueError, match="finite"):
         graph.add_edges(ok, ok + 1, 1.0, resources={"fuel": np.array([1.0, np.nan])})
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edges(ok, np.array([1, 4]), 1.0)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         graph.add_edges(np.array([-1, 0]), ok + 1, 1.0)
     assert graph.num_edges == 0
     assert graph.add_edges([], [], []) == range(0, 0)
 
 
 def test_solve_rejects_bad_arguments(states):
-    graph = cp.Graph(states=states)
+    graph = cr.Graph(states=states)
     graph.add_edge((1, "A"), (2, "A"), 1.0)
     network = graph.compile()
     with pytest.raises(ValueError, match="algorithm"):
         network.solve((1, "A"), (2, "A"), algorithm="dijkstra")
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         network.solve((1, "A"), (7, "A"))
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         network.solve(0, 99)
     with pytest.raises(ValueError, match="dominance_tolerance"):
         network.solve(0, 2, algorithm="rcsp", dominance_tolerance=-1.0)
     with pytest.raises(TypeError):
-        cp.shortest_path("not a network", 0, 1)
+        cr.shortest_path("not a network", 0, 1)

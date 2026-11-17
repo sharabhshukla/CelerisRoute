@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import scipy
 
-import celerispath as cp
+import celerisroute as cr
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
@@ -58,12 +58,12 @@ class LayeredDag:
     def sink(self) -> int:
         return self.num_vertices - 1
 
-    def graph(self, upper: list[float] | None = None) -> cp.Graph:
-        """An uncompiled celerispath graph; ``upper[i]`` bounds resource ``r{i}``."""
-        graph = cp.Graph(num_vertices=self.num_vertices)
+    def graph(self, upper: list[float] | None = None) -> cr.Graph:
+        """An uncompiled celerisroute graph; ``upper[i]`` bounds resource ``r{i}``."""
+        graph = cr.Graph(num_vertices=self.num_vertices)
         for index in range(len(self.resources)):
             bound = float("inf") if upper is None else upper[index]
-            graph.add_resource(cp.Resource(name=f"r{index}", upper=bound))
+            graph.add_resource(cr.Resource(name=f"r{index}", upper=bound))
         graph.add_edges(
             self.edge_source,
             self.edge_target,
@@ -125,7 +125,7 @@ def layered_dag(
 
 
 def reference_cost(instance: LayeredDag, cost: np.ndarray | None = None) -> float:
-    """Shortest source-sink cost by a NumPy layer-by-layer DP (independent of celerispath)."""
+    """Shortest source-sink cost by a NumPy layer-by-layer DP (independent of celerisroute)."""
     cost = instance.cost if cost is None else cost
     distance = np.full(instance.num_vertices, np.inf)
     distance[instance.source] = 0.0
@@ -138,7 +138,7 @@ def reference_cost(instance: LayeredDag, cost: np.ndarray | None = None) -> floa
 def reference_constrained_cost(instance: LayeredDag, upper: int) -> float:
     """Exact one-resource constrained optimum for integer resource data.
 
-    Dynamic program over (vertex, resource consumed); independent of celerispath.
+    Dynamic program over (vertex, resource consumed); independent of celerisroute.
     Memory is ``num_vertices * (upper + 1)`` doubles.
     """
     resource = instance.resources[0].astype(np.int64)
@@ -202,7 +202,7 @@ def environment() -> dict:
         "gil_enabled": gil,
         "numpy": np.__version__,
         "scipy": scipy.__version__,
-        "celerispath": cp.__version__,
+        "celerisroute": cr.__version__,
     }
 
 

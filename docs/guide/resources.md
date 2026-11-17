@@ -1,19 +1,19 @@
 # Resource limits
 
 A shortest path is often not allowed to be just any path: the tank holds only
-so much fuel, the driver may work only so many hours. CelerisPath handles such
+so much fuel, the driver may work only so many hours. CelerisRoute handles such
 limits as **resources**.
 
 ## Declaring a resource
 
 ```python
-import celerispath as cp
+import celerisroute as cr
 
 cities = ["Lisbon", "Porto", "Madrid", "Bordeaux", "Lyon", "Paris", "Zurich", "Berlin"]
-graph = cp.Graph(states=cp.StateSpace(city=cities))
+graph = cr.Graph(states=cr.StateSpace(city=cities))
 
-graph.add_resource(cp.Resource("hours", upper=34))
-graph.add_resource(cp.Resource("tolls", upper=2))
+graph.add_resource(cr.Resource("hours", upper=34))
+graph.add_resource(cr.Resource("tolls", upper=2))
 ```
 
 A resource is *cumulative*: a path starts at `initial` (0 unless you say
@@ -91,7 +91,7 @@ nothing. Use it to get totals such as distance or days at sea on every
 solution:
 
 ```python
-graph.add_resource(cp.Resource("distance"))   # no upper bound
+graph.add_resource(cr.Resource("distance"))   # no upper bound
 ```
 
 ## How the search works, and what it costs

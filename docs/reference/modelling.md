@@ -2,10 +2,10 @@
 
 The objects a model is built from.
 
-::: celerispath.states.StateSpace
+::: celerisroute.states.StateSpace
 
-::: celerispath.graph.Graph
+::: celerisroute.graph.Graph
 
-::: celerispath.graph.Network
+::: celerisroute.graph.Network
 
-::: celerispath.resources.Resource
+::: celerisroute.resources.Resource

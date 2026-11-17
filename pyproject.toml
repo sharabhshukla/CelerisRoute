@@ -3,7 +3,7 @@ requires = ["scikit-build-core>=0.10", "nanobind>=2.4"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "celerispath"
+name = "celerisroute"
 version = "0.1.0"
 description = "Fast DAG and resource-constrained shortest paths for column-generation pricing (C++20/Boost core, Python API)"
 readme = "README.md"
@@ -41,17 +41,17 @@ dev = ["pytest>=7.4"]
 docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.26", "ruff"]
 
 [project.urls]
-Homepage = "https://github.com/sharabhshukla/CelerisPath"
-Documentation = "https://sharabhshukla.github.io/CelerisPath/"
-Repository = "https://github.com/sharabhshukla/CelerisPath"
-Issues = "https://github.com/sharabhshukla/CelerisPath/issues"
-Changelog = "https://github.com/sharabhshukla/CelerisPath/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/sharabhshukla/CelerisRoute"
+Documentation = "https://sharabhshukla.github.io/CelerisRoute/"
+Repository = "https://github.com/sharabhshukla/CelerisRoute"
+Issues = "https://github.com/sharabhshukla/CelerisRoute/issues"
+Changelog = "https://github.com/sharabhshukla/CelerisRoute/blob/main/CHANGELOG.md"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.21"
 cmake.build-type = "Release"
-wheel.packages = ["src/celerispath"]
+wheel.packages = ["src/celerisroute"]
 # Everything not ignored by .gitignore goes into the sdist, minus the entries
 # below. Do not add unanchored names such as "src" to sdist.include: they also
 # match inside ignored directories (.venv/**/src) and override the ignore.
@@ -63,8 +63,8 @@ sdist.exclude = [
 ]
 
 [tool.scikit-build.cmake.define]
-CELERISPATH_BUILD_PYTHON = "ON"
-CELERISPATH_BUILD_BENCHMARKS = "OFF"
+CELERISROUTE_BUILD_PYTHON = "ON"
+CELERISROUTE_BUILD_BENCHMARKS = "OFF"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -81,7 +81,7 @@ test-requires = ["pytest"]
 test-command = "pytest {project}/tests -q"
 
 [tool.cibuildwheel.config-settings]
-"cmake.define.CELERISPATH_WITH_TBB" = "OFF"
+"cmake.define.CELERISROUTE_WITH_TBB" = "OFF"
 
 [tool.cibuildwheel.linux]
 # The project directory is mounted at /project inside the build container.

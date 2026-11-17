@@ -6,12 +6,12 @@ import numpy as np
 import pytest
 import scipy.sparse as sp
 
-import celerispath as cp
+import celerisroute as cr
 from _reference import random_dag
 from test_pricing import busiest_pair, random_matrix
 
 
-def snapshot(result: cp.PricingResult):
+def snapshot(result: cr.PricingResult):
     """Everything observable about a pricing result except its timings."""
     stats = result.statistics
     return (
@@ -55,7 +55,7 @@ def make_engines(count: int, num_constraints: int = 6, seed: int = 0, shared_net
         source, target = pairs[index % len(pairs)] if not shared_network else pairs[int(rng.integers(len(pairs)))]
         matrix = sp.csr_array(random_matrix(rng, num_constraints, instance.num_edges))
         engines.append(
-            cp.PricingEngine(
+            cr.PricingEngine(
                 network, source, target,
                 algorithm="auto" if not shared_network else ("rcsp" if constrained else "dag"),
                 unconstrained=shared_network and not constrained,
@@ -69,7 +69,7 @@ def make_engines(count: int, num_constraints: int = 6, seed: int = 0, shared_net
 def test_batch_equals_serial(threads):
     engines = make_engines(24)
     assert {e.algorithm for e in engines} == {"dag", "rcsp"}
-    batch = cp.BatchPricingEngine(engines=engines)
+    batch = cr.BatchPricingEngine(engines=engines)
     assert len(batch) == 24 and batch.engines == tuple(engines)
     rng = np.random.default_rng(1)
     for _ in range(5):
@@ -85,7 +85,7 @@ def test_batch_equals_serial(threads):
 
 def test_batch_is_deterministic_across_runs_and_thread_counts():
     engines = make_engines(40, seed=7)
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     duals = np.linspace(-3.0, 3.0, 6)
     reference = [snapshot(r) for r in batch.solve_batch(duals, threads=1, negative_only=False)]
     for threads in (None, 2, 4, 8, 8, 8, 16):
@@ -96,7 +96,7 @@ def test_batch_is_deterministic_across_runs_and_thread_counts():
 def test_engines_sharing_one_network():
     engines = make_engines(30, seed=3, shared_network=True)
     assert len({id(e.network) for e in engines}) == 1
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     rng = np.random.default_rng(2)
     for _ in range(4):
         duals = rng.integers(-8, 9, size=6) / 2.0
@@ -107,7 +107,7 @@ def test_engines_sharing_one_network():
 
 def test_per_engine_dual_vectors():
     engines = make_engines(10, seed=4)
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     rng = np.random.default_rng(9)
     duals = rng.integers(-8, 9, size=(10, 6)) / 2.0
     serial = [snapshot(e.solve(row, negative_only=False)) for e, row in zip(engines, duals)]
@@ -120,7 +120,7 @@ def test_per_engine_dual_vectors():
 def test_engines_with_different_numbers_of_constraints():
     first = make_engines(1, num_constraints=3, seed=5)[0]
     second = make_engines(1, num_constraints=5, seed=6)[0]
-    batch = cp.BatchPricingEngine([first, second])
+    batch = cr.BatchPricingEngine([first, second])
     duals = [np.array([1.0, -2.0, 0.5]), np.array([0.5, 0.0, 3.0, -1.0, 2.0])]
     serial = [snapshot(e.solve(d, negative_only=False)) for e, d in zip((first, second), duals)]
     assert [snapshot(r) for r in batch.solve_batch(duals, threads=2, negative_only=False)] == serial
@@ -130,7 +130,7 @@ def test_engines_with_different_numbers_of_constraints():
 
 def test_multiple_paths_per_engine():
     engines = [e for e in make_engines(16, seed=8) if e.algorithm == "dag"]
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     duals = np.array([1.0, -1.0, 2.0, 0.5, -2.5, 3.0])
     serial = [snapshot(e.solve(duals, max_paths=4, negative_only=False)) for e in engines]
     parallel = batch.solve_batch(duals, max_paths_per_engine=4, threads=4, negative_only=False)
@@ -140,18 +140,18 @@ def test_multiple_paths_per_engine():
 
 def test_multiple_paths_with_an_rcsp_engine_raise_not_implemented():
     engines = make_engines(4, seed=8)
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     with pytest.raises(NotImplementedError, match="max_paths > 1"):
         batch.solve_batch(np.zeros(6), max_paths_per_engine=2)
 
 
 def test_failing_engine_is_identified():
     engines = make_engines(6, seed=10)
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     duals = np.zeros((6, 6))
     duals[4, 2] = math.nan
     duals[1, 0] = math.inf
-    with pytest.raises(cp.BatchPricingError) as info:
+    with pytest.raises(cr.BatchPricingError) as info:
         batch.solve_batch(duals, threads=3)
     error = info.value
     assert sorted(error.errors) == [1, 4]
@@ -159,18 +159,18 @@ def test_failing_engine_is_identified():
     assert "engines[1]" in str(error) and "engines[4]" in str(error)
     assert "engine-4" in str(error)  # the engine's name
     assert "not finite" in error.errors[4]
-    assert isinstance(error, RuntimeError) and isinstance(error, cp.CelerisPathError)
+    assert isinstance(error, RuntimeError) and isinstance(error, cr.CelerisRouteError)
     # The batch and its engines remain usable afterwards.
     assert len(batch.solve_batch(np.zeros(6), negative_only=False)) == 6
 
 
 def test_invalid_batch_arguments():
     engines = make_engines(3, seed=11)
-    batch = cp.BatchPricingEngine(engines)
+    batch = cr.BatchPricingEngine(engines)
     with pytest.raises(TypeError, match=r"engines\[1\]"):
-        cp.BatchPricingEngine([engines[0], "engine"])
+        cr.BatchPricingEngine([engines[0], "engine"])
     with pytest.raises(ValueError, match="more than once"):
-        cp.BatchPricingEngine([engines[0], engines[0]])
+        cr.BatchPricingEngine([engines[0], engines[0]])
     with pytest.raises(ValueError, match="2 dual vectors for 3 engines"):
         batch.solve_batch(np.zeros((2, 6)))
     with pytest.raises(ValueError, match=r"engines\[0\]"):
@@ -183,7 +183,7 @@ def test_invalid_batch_arguments():
         with pytest.raises(ValueError, match="threads"):
             batch.solve_batch(np.zeros(6), threads=bad)
         with pytest.raises(ValueError, match="threads"):
-            cp.BatchPricingEngine(engines, threads=bad)
+            cr.BatchPricingEngine(engines, threads=bad)
     with pytest.raises(TypeError, match="threads"):
         batch.solve_batch(np.zeros(6), threads=2.5)
     with pytest.raises(ValueError, match="at least 1"):
@@ -193,10 +193,10 @@ def test_invalid_batch_arguments():
 
 
 def test_empty_and_single_engine_batches():
-    assert cp.BatchPricingEngine([]).solve_batch(np.zeros(3)) == []
+    assert cr.BatchPricingEngine([]).solve_batch(np.zeros(3)) == []
     engine = make_engines(1, seed=12)[0]
     duals = np.ones(6)
-    result = cp.BatchPricingEngine([engine], threads=4).solve_batch(duals, negative_only=False)
+    result = cr.BatchPricingEngine([engine], threads=4).solve_batch(duals, negative_only=False)
     assert [snapshot(r) for r in result] == [snapshot(engine.solve(duals, negative_only=False))]
 
 
@@ -240,7 +240,7 @@ def test_network_solves_from_python_threads():
 
 def test_batch_statistics_are_per_engine():
     engines = make_engines(4, seed=16)
-    results = cp.BatchPricingEngine(engines).solve_batch(np.zeros(6), threads=2, negative_only=False)
+    results = cr.BatchPricingEngine(engines).solve_batch(np.zeros(6), threads=2, negative_only=False)
     for engine, result in zip(engines, results):
         stats = result.statistics
         assert stats.algorithm == engine.algorithm

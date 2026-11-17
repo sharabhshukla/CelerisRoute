@@ -11,7 +11,7 @@ through the network is the most profitable voyage plan.
 Run with:  python examples/vessel_routing.py
 """
 
-import celerispath as cp
+import celerisroute as cr
 
 DAYS = range(1, 31)
 PORTS = ["Dubai", "Mumbai", "Singapore", "Rotterdam"]
@@ -30,9 +30,9 @@ SELLING_PRICE = {"Mumbai": 140, "Singapore": 230, "Rotterdam": 420}
 FUEL_TANK = 20           # days of sailing the vessel can do on one tank
 
 # ---- model: one state per (day, port, cargo), one edge per possible action ----
-states = cp.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=FUEL_TANK))
+states = cr.StateSpace(day=DAYS, port=PORTS, cargo=["empty", "full"])
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=FUEL_TANK))
 
 for day in DAYS:
     for port in PORTS:

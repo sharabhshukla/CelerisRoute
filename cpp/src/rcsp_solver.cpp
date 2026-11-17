@@ -1,4 +1,4 @@
-#include "celerispath/rcsp_solver.hpp"
+#include "celerisroute/rcsp_solver.hpp"
 
 #include <algorithm>
 #include <array>
@@ -8,9 +8,9 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/r_c_shortest_paths.hpp>
 
-#include "celerispath/bgl_adaptor.hpp"
+#include "celerisroute/bgl_adaptor.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 namespace {
 
@@ -291,4 +291,4 @@ PathResult solve_rcsp(const Csr& csr, const RcspData& resources, const double* s
     }
 }
 
-}  // namespace celerispath
+}  // namespace celerisroute

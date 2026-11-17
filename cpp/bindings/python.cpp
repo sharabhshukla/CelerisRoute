@@ -1,4 +1,4 @@
-// nanobind module celerispath._core: a thin, private bridge between the Python
+// nanobind module celerisroute._core: a thin, private bridge between the Python
 // package and the native core. Argument normalisation and the public object
 // model live in Python; this file only moves contiguous buffers across.
 #include <cstdint>
@@ -15,13 +15,13 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-#include "celerispath/graph.hpp"
-#include "celerispath/pricing_engine.hpp"
-#include "celerispath/pricing_fleet.hpp"
+#include "celerisroute/graph.hpp"
+#include "celerisroute/pricing_engine.hpp"
+#include "celerisroute/pricing_fleet.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;
-using namespace celerispath;
+using namespace celerisroute;
 
 namespace {
 
@@ -137,7 +137,7 @@ nb::tuple pricing_result_tuple(PricingResult&& result) {
 }  // namespace
 
 NB_MODULE(_core, m) {
-    m.doc() = "Private native core of celerispath. Use the celerispath package instead.";
+    m.doc() = "Private native core of celerisroute. Use the celerisroute package instead.";
 
     nb::class_<PyBuilder>(m, "GraphBuilder")
         .def(nb::init<std::uint64_t>(), "num_vertices"_a)

@@ -4,11 +4,11 @@ hide:
   - toc
 ---
 
-<div class="cp-hero" markdown>
+<div class="cr-hero" markdown>
 
-# CelerisPath
+# CelerisRoute
 
-<p class="cp-tagline">
+<p class="cr-tagline">
 Fast shortest paths on state-space DAGs, built for the pricing step of column
 generation. A C++20 core on the Boost Graph Library, with an API you can read.
 </p>
@@ -20,11 +20,11 @@ generation. A C++20 core on the Boost Graph Library, with an API you can read.
 </div>
 
 ```python
-import celerispath as cp
+import celerisroute as cr
 
-states = cp.StateSpace(day=range(1, 4), port=["A", "B"])   # vertices are named states
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=10))
+states = cr.StateSpace(day=range(1, 4), port=["A", "B"])   # vertices are named states
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=10))
 
 graph.add_edge((1, "A"), (2, "A"), cost=1, resources={"fuel": 1})
 graph.add_edge((1, "A"), (2, "B"), cost=5, resources={"fuel": 6})
@@ -36,10 +36,10 @@ print(route.cost, route.path, route.resources)
 # 10.0 [(1, 'A'), (2, 'A'), (3, 'B')] {'fuel': 7.0}
 ```
 
-The cheapest route costs 6 but needs 11 units of fuel. CelerisPath returns the
+The cheapest route costs 6 but needs 11 units of fuel. CelerisRoute returns the
 cheapest route that fits in the tank.
 
-## Why CelerisPath
+## Why CelerisRoute
 
 <div class="grid cards" markdown>
 
@@ -98,10 +98,10 @@ cheapest route that fits in the tank.
 ## Install
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ celerispath
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ celerisroute
 ```
 
-CelerisPath is in a pre-release phase and is published on TestPyPI. See
+CelerisRoute is in a pre-release phase and is published on TestPyPI. See
 [Installation](getting-started/installation.md) for building from source.
 
 ## Where to go next

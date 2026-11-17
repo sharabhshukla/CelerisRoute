@@ -48,7 +48,7 @@ from dataclasses import dataclass
 import numpy as np
 import scipy.sparse as sp
 
-import celerispath as cp
+import celerisroute as cr
 from _common import format_seconds, save
 
 NUM_PRODUCTS = 2
@@ -102,8 +102,8 @@ class Instance:
     def num_constraints(self) -> int:
         return self.num_ports * self.num_days * NUM_PRODUCTS + self.num_vessels
 
-    def mapping(self) -> cp.PortTimeProductDuals:
-        return cp.PortTimeProductDuals(
+    def mapping(self) -> cr.PortTimeProductDuals:
+        return cr.PortTimeProductDuals(
             self.op_port, self.op_day, self.op_product, 1.0,
             shape=(self.num_ports, self.num_days, NUM_PRODUCTS),
             extra_constraints=self.num_vessels,
@@ -225,19 +225,19 @@ def build_instance(num_ports: int, num_days: int, num_vessels: int, seed: int) -
 # -------------------------------------------------------------------- designs
 
 
-def shared_network(instance: Instance, algorithm: str) -> cp.Network:
-    graph = cp.Graph(num_vertices=instance.num_vertices)
+def shared_network(instance: Instance, algorithm: str) -> cr.Network:
+    graph = cr.Graph(num_vertices=instance.num_vertices)
     # The loosest bunker capacity bounds the shared graph; vessels tighten it.
     upper = float(instance.fuel_limit.max()) if algorithm == "rcsp" else float("inf")
-    graph.add_resource(cp.Resource("fuel", upper=upper))
+    graph.add_resource(cr.Resource("fuel", upper=upper))
     graph.add_edges(instance.edge_source, instance.edge_target, instance.cost,
                     resources={"fuel": instance.fuel})
     return graph.compile()
 
 
-def build_fleet(instance: Instance, config: dict) -> cp.PricingFleet:
+def build_fleet(instance: Instance, config: dict) -> cr.PricingFleet:
     network = shared_network(instance, config["algorithm"])
-    fleet = cp.PricingFleet(
+    fleet = cr.PricingFleet(
         network, dual_mapping=instance.mapping(), algorithm=config["algorithm"],
         threads=config["threads"], scheduler=config["scheduler"],
         cost_update=config["cost_update"], partitioner=config.get("partitioner", "auto"),
@@ -265,7 +265,7 @@ def build_fleet(instance: Instance, config: dict) -> cp.PricingFleet:
     return fleet.prepare()
 
 
-def build_engines(instance: Instance, config: dict) -> cp.BatchPricingEngine:
+def build_engines(instance: Instance, config: dict) -> cr.BatchPricingEngine:
     """The same subproblems as one self-contained network and engine per vessel."""
     matrix = instance.mapping().matrix()
     engines = []
@@ -274,18 +274,18 @@ def build_engines(instance: Instance, config: dict) -> cp.BatchPricingEngine:
         keep[instance.forbidden_edges(v)] = False
         cost = instance.cost.copy()
         cost[instance.discounted_edges(v)] -= FEE_DISCOUNT
-        graph = cp.Graph(num_vertices=instance.num_vertices)
+        graph = cr.Graph(num_vertices=instance.num_vertices)
         upper = float(instance.fuel_limit[v]) if config["algorithm"] == "rcsp" else float("inf")
-        graph.add_resource(cp.Resource("fuel", upper=upper))
+        graph.add_resource(cr.Resource("fuel", upper=upper))
         graph.add_edges(instance.edge_source[keep], instance.edge_target[keep], cost[keep],
                         resources={"fuel": instance.fuel[keep]})
-        engines.append(cp.PricingEngine(
+        engines.append(cr.PricingEngine(
             graph.compile(), int(instance.start[v]), instance.sink,
             algorithm=config["algorithm"], dual_matrix=matrix[:, keep],
             fixed_cost=float(instance.charter[v]),
             fixed_coefficients={instance.convexity_row(v): 1.0},
         ))
-    return cp.BatchPricingEngine(engines, threads=config["threads"])
+    return cr.BatchPricingEngine(engines, threads=config["threads"])
 
 
 # --------------------------------------------------------------------- worker
@@ -479,11 +479,11 @@ def main() -> None:
         thread_counts = sorted({1, 2, 4, 8, hardware})
         vessel_counts = (25, 125, 500)
         per_vessel_limit = 125  # graph-per-vessel beyond this needs too much memory
-    scheduler = "tbb" if cp.tbb_available() else "threads"
+    scheduler = "tbb" if cr.tbb_available() else "threads"
     base = {"ports": ports, "seed": arguments.seed, "iterations": iterations,
             "scheduler": scheduler, "cost_update": "indexed"}
     load = os.getloadavg()[0]
-    print(f"celerispath {cp.__version__}, oneTBB {cp.tbb_version()}, {hardware} hardware threads, "
+    print(f"celerisroute {cr.__version__}, oneTBB {cr.tbb_version()}, {hardware} hardware threads, "
           f"load average {load:.2f}")
     if load > 2.0:
         print("  warning: the machine is busy; timings will be noisy")
@@ -550,7 +550,7 @@ def main() -> None:
     config = {"ports": ports, "vessels": vessels, "horizons": list(horizons),
               "iterations": iterations, "thread_counts": thread_counts,
               "vessel_counts": list(vessel_counts), "seed": arguments.seed,
-              "tbb": cp.tbb_version(), "load_average_at_start": load,
+              "tbb": cr.tbb_version(), "load_average_at_start": load,
               "load_average_at_end": os.getloadavg()[0]}
     path = save("fleet", config, rows, arguments.output)
     print(f"Raw results: {path}")

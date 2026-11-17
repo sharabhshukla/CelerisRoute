@@ -2,12 +2,12 @@
 
 Repeated solves with dual-adjusted costs. See the guide page [Pricing with duals](../guide/pricing.md).
 
-::: celerispath.pricing.PricingEngine
+::: celerisroute.pricing.PricingEngine
 
-::: celerispath.pricing.BatchPricingEngine
+::: celerisroute.pricing.BatchPricingEngine
 
-::: celerispath.results.PricingResult
+::: celerisroute.results.PricingResult
 
-::: celerispath.results.Column
+::: celerisroute.results.Column
 
-::: celerispath.results.PricingStatistics
+::: celerisroute.results.PricingStatistics

@@ -59,4 +59,4 @@ With unlimited fuel the vessel makes the long, lucrative trip to Rotterdam.
 On one tank it cannot get there and back, and three short round trips to
 Mumbai become the best plan.
 
-[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/vessel_routing.py){ .md-button }
+[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisRoute/blob/main/examples/vessel_routing.py){ .md-button }

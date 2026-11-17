@@ -35,7 +35,7 @@
     "gil_enabled": false,
     "numpy": "2.5.5",
     "scipy": "1.18.1",
-    "celerispath": "0.1.0"
+    "celerisroute": "0.1.0"
   },
   "results": [
     {

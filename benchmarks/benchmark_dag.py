@@ -13,7 +13,7 @@ import argparse
 
 import numpy as np
 
-import celerispath as cp
+import celerisroute as cr
 from _common import format_seconds, layered_dag, reference_cost, repeat, save, summary, timed
 
 SIZES = (1_000, 10_000, 100_000, 1_000_000)
@@ -31,7 +31,7 @@ def run(num_vertices: int, width: int, degree: int, seed: int) -> dict:
 
     native: list[float] = []
 
-    def solve() -> cp.Solution:
+    def solve() -> cr.Solution:
         solution = network.solve(source, sink, algorithm="dag")
         native.append(solution.statistics.solve_time)
         return solution

@@ -14,6 +14,6 @@ Plain scripts, meant to be read from top to bottom. They build on each other.
 python examples/shortest_path.py
 ```
 
-They need nothing beyond CelerisPath and its dependencies (NumPy and SciPy).
-The [documentation](https://sharabhshukla.github.io/CelerisPath/examples/)
+They need nothing beyond CelerisRoute and its dependencies (NumPy and SciPy).
+The [documentation](https://sharabhshukla.github.io/CelerisRoute/examples/)
 walks through each one with its output.

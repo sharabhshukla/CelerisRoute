@@ -316,7 +316,7 @@ class StateSpace:
         """Integer id of one state.
 
         Accepts a tuple in dimension order, a mapping, or keyword arguments.
-        Raises ``celerispath.InvalidStateError`` for a state outside the
+        Raises ``celerisroute.InvalidStateError`` for a state outside the
         space.
         """
         components = self._components(state, named)

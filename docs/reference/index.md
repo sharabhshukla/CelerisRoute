@@ -3,7 +3,7 @@
 Everything is imported from the top-level package:
 
 ```python
-import celerispath as cp
+import celerisroute as cr
 ```
 
 | | |
@@ -12,7 +12,7 @@ import celerispath as cp
 | [Solving](solving.md) | `shortest_path`, `resource_shortest_path`, `Solution`, `SolveStatistics`, `Status` |
 | [Pricing](pricing.md) | `PricingEngine`, `BatchPricingEngine`, `PricingResult`, `Column`, `PricingStatistics` |
 | [Fleet pricing](fleet.md) | `PricingFleet`, `FleetResult`, `FleetColumn`, `FleetStatistics`, `IndexedDuals`, `PortTimeProductDuals` |
-| [Errors](errors.md) | `CelerisPathError` and its subclasses |
+| [Errors](errors.md) | `CelerisRouteError` and its subclasses |
 
 The package is fully typed and ships a `py.typed` marker, so editors and type
 checkers see the same signatures as this reference.

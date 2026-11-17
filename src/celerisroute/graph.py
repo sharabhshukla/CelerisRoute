@@ -158,7 +158,7 @@ class Graph:
         """Declare a resource. See ``Resource`` for the supported semantics."""
         if not isinstance(resource, Resource):
             raise TypeError(
-                f"add_resource expects a celerispath.Resource, got {type(resource).__name__}"
+                f"add_resource expects a celerisroute.Resource, got {type(resource).__name__}"
             )
         if resource.name in self._resources:
             raise ValueError(f"resource {resource.name!r} is already declared")
@@ -260,7 +260,7 @@ class Graph:
         if undeclared:
             raise ValueError(
                 f"edges use the resource(s) {undeclared}, which were never declared. Declare "
-                "each with graph.add_resource(celerispath.Resource(name, upper=...)); a resource "
+                "each with graph.add_resource(celerisroute.Resource(name, upper=...)); a resource "
                 "with the default upper=inf is only accumulated and reported"
             )
         declared = list(self._resources.values())
@@ -416,7 +416,7 @@ class Network:
         """A network with the same topology and resources but new edge costs.
 
         The topology is shared, not copied. For repeated dual updates prefer
-        ``celerispath.PricingEngine``, which updates costs in place.
+        ``celerisroute.PricingEngine``, which updates costs in place.
         """
         values = _as_value_array(cost, self.num_edges, "cost")
         return Network(self._core.with_costs(values), self._states, self._declared)

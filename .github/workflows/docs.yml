@@ -6,7 +6,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
-      - "src/celerispath/**"
+      - "src/celerisroute/**"
       - "examples/**"
       - "CHANGELOG.md"
       - "CONTRIBUTING.md"
@@ -15,7 +15,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
-      - "src/celerispath/**"
+      - "src/celerisroute/**"
       - "examples/**"
       - "CHANGELOG.md"
       - "CONTRIBUTING.md"

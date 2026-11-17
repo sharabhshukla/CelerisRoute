@@ -12,7 +12,7 @@
       and that count can explode. Read the RCSP table before you rely on it.
 
 Every number on this page comes from a result file in
-[`benchmarks/results/`](https://github.com/sharabhshukla/CelerisPath/tree/main/benchmarks/results),
+[`benchmarks/results/`](https://github.com/sharabhshukla/CelerisRoute/tree/main/benchmarks/results),
 measured on
 an Apple M4 (4 performance + 6 efficiency cores, 16 GB), macOS 27, Apple Clang
 21, Boost 1.92, free-threaded CPython 3.14, Release build, seed 20240607. The
@@ -248,7 +248,7 @@ configuration, the environment and all raw timings to
 A native harness times the C++ core without Python:
 
 ```bash
-cmake -S . -B build/bench -DCELERISPATH_BUILD_PYTHON=OFF -DCELERISPATH_BUILD_BENCHMARKS=ON
+cmake -S . -B build/bench -DCELERISROUTE_BUILD_PYTHON=OFF -DCELERISROUTE_BUILD_BENCHMARKS=ON
 cmake --build build/bench
-./build/bench/celerispath_bench
+./build/bench/celerisroute_bench
 ```

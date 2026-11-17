@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 
-import celerispath as cp
+import celerisroute as cr
 from _reference import best_cost, check_path, enumerate_paths, path_cost, random_dag
 
 
 def build(num_vertices, edges):
-    graph = cp.Graph(num_vertices=num_vertices)
+    graph = cr.Graph(num_vertices=num_vertices)
     for source, target, cost in edges:
         graph.add_edge(source, target, cost)
     return graph.compile()
@@ -15,7 +15,7 @@ def build(num_vertices, edges):
 def test_single_edge_path():
     network = build(2, [(0, 1, 4.5)])
     solution = network.solve(0, 1, algorithm="dag")
-    assert solution.status == "optimal" and solution.status is cp.Status.OPTIMAL
+    assert solution.status == "optimal" and solution.status is cr.Status.OPTIMAL
     assert solution.found and bool(solution)
     assert solution.cost == 4.5
     assert solution.edges.tolist() == [0]
@@ -64,7 +64,7 @@ def test_negative_cost_edges():
 def test_unreachable_target():
     network = build(4, [(0, 1, 1.0), (2, 3, 1.0)])
     solution = network.solve(0, 3)
-    assert solution.status == "unreachable" and solution.status is cp.Status.UNREACHABLE
+    assert solution.status == "unreachable" and solution.status is cr.Status.UNREACHABLE
     assert not solution.found and not solution
     assert solution.cost == float("inf")
     assert solution.edges.size == 0 and solution.nodes.size == 0
@@ -98,14 +98,14 @@ def test_duplicate_edges():
 
 
 def test_path_through_state_space():
-    states = cp.StateSpace(day=range(1, 5), port=["A", "B"])
-    graph = cp.Graph(states=states)
+    states = cr.StateSpace(day=range(1, 5), port=["A", "B"])
+    graph = cr.Graph(states=states)
     for day in range(1, 4):
         graph.add_edge((day, "A"), (day + 1, "A"), 1.0)  # wait at A
         graph.add_edge((day, "A"), (day + 1, "B"), 0.25)  # sail A -> B
         graph.add_edge((day, "B"), (day + 1, "B"), 1.0)  # wait at B
     network = graph.compile()
-    solution = cp.shortest_path(network, (1, "A"), (4, "B"))
+    solution = cr.shortest_path(network, (1, "A"), (4, "B"))
     assert solution.cost == 2.25
     assert solution.path == [(1, "A"), (2, "B"), (3, "B"), (4, "B")]
     assert solution.nodes.tolist() == [states.id(s) for s in solution.path]
@@ -125,17 +125,17 @@ def test_repeated_solves_on_a_compiled_network_are_independent():
 
 
 def test_shortest_path_function_reuses_the_network_and_accepts_graphs():
-    graph = cp.Graph(num_vertices=3)
+    graph = cr.Graph(num_vertices=3)
     graph.add_edge(0, 1, 1.0)
     graph.add_edge(1, 2, 1.0)
     network = graph.compile()
-    assert cp.shortest_path(network, 0, 2).cost == 2.0
-    assert cp.shortest_path(graph, 0, 2).cost == 2.0  # compiled on the fly
+    assert cr.shortest_path(network, 0, 2).cost == 2.0
+    assert cr.shortest_path(graph, 0, 2).cost == 2.0  # compiled on the fly
 
 
 def test_dag_refuses_to_silently_ignore_resource_bounds():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("fuel", upper=5.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("fuel", upper=5.0))
     graph.add_edge(0, 1, 1.0, {"fuel": 4.0})
     graph.add_edge(1, 2, 1.0, {"fuel": 4.0})
     graph.add_edge(0, 2, 9.0, {"fuel": 1.0})
@@ -143,20 +143,20 @@ def test_dag_refuses_to_silently_ignore_resource_bounds():
     with pytest.raises(ValueError, match="unconstrained=True"):
         network.solve(0, 2, algorithm="dag")
     with pytest.raises(ValueError, match="unconstrained=True"):
-        cp.shortest_path(network, 0, 2)
+        cr.shortest_path(network, 0, 2)
     with pytest.raises(ValueError, match="contradicts"):
         network.solve(0, 2, algorithm="rcsp", unconstrained=True)
     relaxed = network.solve(0, 2, algorithm="dag", unconstrained=True)
     assert relaxed.cost == 2.0
     assert relaxed.resources == {"fuel": 8.0}  # reported, although above the bound
-    assert cp.shortest_path(network, 0, 2, unconstrained=True).cost == 2.0
+    assert cr.shortest_path(network, 0, 2, unconstrained=True).cost == 2.0
     assert network.solve(0, 2, unconstrained=True).statistics.algorithm == "dag"
     assert network.solve(0, 2).cost == 9.0  # "auto" respects the bound
 
 
 def test_unbounded_resource_is_reported_by_the_dag_solver():
-    graph = cp.Graph(num_vertices=3)
-    graph.add_resource(cp.Resource("distance", initial=2.0))
+    graph = cr.Graph(num_vertices=3)
+    graph.add_resource(cr.Resource("distance", initial=2.0))
     graph.add_edge(0, 1, 1.0, {"distance": 10.0})
     graph.add_edge(1, 2, 1.0, {"distance": 5.5})
     solution = graph.compile().solve(0, 2)
@@ -179,7 +179,7 @@ def test_random_dags_against_exhaustive_enumeration(seed):
             for solution in (
                 network.solve(source, target, algorithm="dag"),
                 network.solve(source, target, algorithm="rcsp"),
-                cp.shortest_path(network, source, target),
+                cr.shortest_path(network, source, target),
             ):
                 if not paths:
                     assert solution.status == "unreachable"
@@ -211,7 +211,7 @@ def test_layered_graph_built_in_bulk():
     target = np.concatenate(targets)
     cost = rng.uniform(-1.0, 1.0, size=source.shape[0])
 
-    graph = cp.Graph(num_vertices=num_vertices)
+    graph = cr.Graph(num_vertices=num_vertices)
     graph.add_edges(source, target, cost)
     solution = graph.compile().solve(source_vertex, target_vertex)
 

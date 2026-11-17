@@ -145,7 +145,7 @@ class PricingEngine:
                 "PricingEngine needs a compiled network: pass graph=my_graph.compile()"
             )
         if not isinstance(graph, Network):
-            raise TypeError(f"graph must be a celerispath.Network, got {type(graph).__name__}")
+            raise TypeError(f"graph must be a celerisroute.Network, got {type(graph).__name__}")
         self._network = graph
         self._algorithm = graph._resolve_algorithm(algorithm, unconstrained)
         graph._require_acyclic()

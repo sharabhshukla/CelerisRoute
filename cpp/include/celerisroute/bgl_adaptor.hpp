@@ -1,4 +1,4 @@
-// Adapts celerispath::Csr to the Boost Graph Library concepts required by
+// Adapts celerisroute::Csr to the Boost Graph Library concepts required by
 // boost::dag_shortest_paths and boost::r_c_shortest_paths (IncidenceGraph and
 // VertexListGraph), so both solvers traverse the same contiguous arrays
 // without copying them into a Boost container.
@@ -12,9 +12,9 @@
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/property_map/property_map.hpp>
 
-#include "celerispath/types.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 // Edge descriptor: a distinct type (rather than a bare integer) so it can
 // never be confused with a vertex descriptor in overload resolution.
@@ -47,46 +47,46 @@ inline std::size_t get(const SlotIndexMap&, EdgeRef e) { return e.slot; }
 
 using VertexIndexMap = boost::typed_identity_property_map<VertexId>;
 
-}  // namespace celerispath
+}  // namespace celerisroute
 
 namespace boost {
 
 template <>
-struct graph_traits<celerispath::BglGraph> {
-    using vertex_descriptor = celerispath::VertexId;
-    using edge_descriptor = celerispath::EdgeRef;
+struct graph_traits<celerisroute::BglGraph> {
+    using vertex_descriptor = celerisroute::VertexId;
+    using edge_descriptor = celerisroute::EdgeRef;
     using directed_category = directed_tag;
     using edge_parallel_category = allow_parallel_edge_tag;
-    using traversal_category = celerispath::BglTraversalTag;
+    using traversal_category = celerisroute::BglTraversalTag;
     using vertices_size_type = std::uint32_t;
     using edges_size_type = std::uint32_t;
     using degree_size_type = std::uint32_t;
-    using vertex_iterator = counting_iterator<celerispath::VertexId>;
+    using vertex_iterator = counting_iterator<celerisroute::VertexId>;
     using out_edge_iterator =
-        transform_iterator<celerispath::SlotToEdgeRef, counting_iterator<celerispath::Slot>>;
+        transform_iterator<celerisroute::SlotToEdgeRef, counting_iterator<celerisroute::Slot>>;
 
-    static vertex_descriptor null_vertex() { return celerispath::kInvalid; }
+    static vertex_descriptor null_vertex() { return celerisroute::kInvalid; }
 };
 
 template <>
-struct property_traits<celerispath::SlotCostMap> {
+struct property_traits<celerisroute::SlotCostMap> {
     using value_type = double;
     using reference = double;
-    using key_type = celerispath::EdgeRef;
+    using key_type = celerisroute::EdgeRef;
     using category = readable_property_map_tag;
 };
 
 template <>
-struct property_traits<celerispath::SlotIndexMap> {
+struct property_traits<celerisroute::SlotIndexMap> {
     using value_type = std::size_t;
     using reference = std::size_t;
-    using key_type = celerispath::EdgeRef;
+    using key_type = celerisroute::EdgeRef;
     using category = readable_property_map_tag;
 };
 
 }  // namespace boost
 
-namespace celerispath {
+namespace celerisroute {
 
 using BglTraits = boost::graph_traits<BglGraph>;
 
@@ -112,4 +112,4 @@ inline std::uint32_t out_degree(VertexId v, const BglGraph& g) {
 inline VertexId source(EdgeRef e, const BglGraph& g) { return g.csr->slot_source[e.slot]; }
 inline VertexId target(EdgeRef e, const BglGraph& g) { return g.csr->slot_target[e.slot]; }
 
-}  // namespace celerispath
+}  // namespace celerisroute

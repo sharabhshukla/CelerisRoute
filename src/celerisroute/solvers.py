@@ -15,7 +15,7 @@ def _as_network(network: Network | Graph) -> Network:
         # Convenient for one-off solves; compile once yourself for repeated ones.
         return network.compile()
     raise TypeError(
-        f"expected a celerispath.Network (or Graph), got {type(network).__name__}"
+        f"expected a celerisroute.Network (or Graph), got {type(network).__name__}"
     )
 
 

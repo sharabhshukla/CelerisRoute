@@ -1,22 +1,22 @@
-"""celerispath: fast shortest paths on state-space DAGs for column generation.
+"""celerisroute: fast shortest paths on state-space DAGs for column generation.
 
 Typical use:
 
-    import celerispath as cp
+    import celerisroute as cr
 
-    states = cp.StateSpace(day=range(1, 36), port=["A", "B"], inventory=[0.0, 0.5, 1.0])
-    graph = cp.Graph(states=states)
-    graph.add_resource(cp.Resource(name="fuel", upper=100.0))
+    states = cr.StateSpace(day=range(1, 36), port=["A", "B"], inventory=[0.0, 0.5, 1.0])
+    graph = cr.Graph(states=states)
+    graph.add_resource(cr.Resource(name="fuel", upper=100.0))
     graph.add_edge((1, "A", 0.0), (2, "B", 0.5), cost=120.0, resources={"fuel": 30.0})
     network = graph.compile()
 
     solution = network.solve((1, "A", 0.0), (2, "B", 0.5))
     solution.path, solution.cost, solution.resources
 
-    pricing = cp.PricingEngine(network, source, target, dual_matrix=A)
+    pricing = cr.PricingEngine(network, source, target, dual_matrix=A)
     columns = pricing.solve(duals, negative_only=True)
 
-    fleet = cp.PricingFleet(network, dual_matrix=A)      # many subproblems, one network
+    fleet = cr.PricingFleet(network, dual_matrix=A)      # many subproblems, one network
     fleet.add_vessels(ids=names, source=sources, target=targets)
     result = fleet.price(duals)
 
@@ -26,7 +26,7 @@ The numerical work is done by a C++20 core built on the Boost Graph Library
 
 from __future__ import annotations
 
-from .errors import BatchPricingError, CyclicGraphError, InvalidStateError, CelerisPathError
+from .errors import BatchPricingError, CyclicGraphError, InvalidStateError, CelerisRouteError
 from .fleet import (
     FleetColumn,
     FleetResult,
@@ -65,7 +65,7 @@ __all__ = [
     "IndexedDuals",
     "InvalidStateError",
     "Network",
-    "CelerisPathError",
+    "CelerisRouteError",
     "PortTimeProductDuals",
     "PricingEngine",
     "PricingFleet",

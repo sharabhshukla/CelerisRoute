@@ -65,7 +65,7 @@ jobs:
         run: python -m pip install --verbose ".[dev]"
 
       - name: Show the build
-        run: python -c "import celerispath as cp; print(cp.__version__, 'oneTBB:', cp.tbb_version())"
+        run: python -c "import celerisroute as cr; print(cr.__version__, 'oneTBB:', cr.tbb_version())"
 
       - name: Run the tests
         run: python -m pytest

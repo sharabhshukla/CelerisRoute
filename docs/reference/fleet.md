@@ -2,18 +2,18 @@
 
 Many subproblems on one shared network. See the guide page [Fleet pricing](../guide/fleet.md).
 
-::: celerispath.fleet.PricingFleet
+::: celerisroute.fleet.PricingFleet
 
-::: celerispath.fleet.FleetResult
+::: celerisroute.fleet.FleetResult
 
-::: celerispath.fleet.FleetColumn
+::: celerisroute.fleet.FleetColumn
 
-::: celerispath.fleet.FleetStatistics
+::: celerisroute.fleet.FleetStatistics
 
-::: celerispath.fleet.IndexedDuals
+::: celerisroute.fleet.IndexedDuals
 
-::: celerispath.fleet.PortTimeProductDuals
+::: celerisroute.fleet.PortTimeProductDuals
 
-::: celerispath.fleet.tbb_available
+::: celerisroute.fleet.tbb_available
 
-::: celerispath.fleet.tbb_version
+::: celerisroute.fleet.tbb_version

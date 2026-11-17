@@ -1,4 +1,4 @@
-// Common value types shared by the celerispath native core.
+// Common value types shared by the celerisroute native core.
 #pragma once
 
 #include <atomic>
@@ -8,7 +8,7 @@
 #include <limits>
 #include <vector>
 
-namespace celerispath {
+namespace celerisroute {
 
 using VertexId = std::uint32_t;
 using EdgeId = std::uint32_t;
@@ -97,4 +97,4 @@ struct PathResult {
     std::vector<Slot> slots;
 };
 
-}  // namespace celerispath
+}  // namespace celerisroute

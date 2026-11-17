@@ -3,15 +3,15 @@ import itertools
 import numpy as np
 import pytest
 
-import celerispath as cp
+import celerisroute as cr
 
 PORTS = ["Singapore", "Dubai", "Rotterdam", "Houston", "Mumbai"]
 INVENTORY = [0.0, 0.25, 0.50, 0.75, 1.0]
 
 
 @pytest.fixture
-def vessel_states() -> cp.StateSpace:
-    return cp.StateSpace(day=range(1, 36), port=PORTS, inventory=INVENTORY)
+def vessel_states() -> cr.StateSpace:
+    return cr.StateSpace(day=range(1, 36), port=PORTS, inventory=INVENTORY)
 
 
 def test_size_shape_and_names(vessel_states):
@@ -47,7 +47,7 @@ def test_decode_inverts_id_for_every_state(vessel_states):
 
 
 def test_iteration_matches_decode():
-    states = cp.StateSpace(a=[3, 1, 2], b=["x", "y"])
+    states = cr.StateSpace(a=[3, 1, 2], b=["x", "y"])
     assert list(states) == [states.decode(i) for i in range(len(states))]
     assert states.decode(0) == (3, "x")  # insertion order, not sorted order
 
@@ -78,7 +78,7 @@ def test_vectorised_ids_broadcast_scalars(vessel_states):
 
 
 def test_supported_value_types():
-    states = cp.StateSpace(
+    states = cr.StateSpace(
         number=[10, 20],
         real=[0.5, 1.5],
         text=["a", "b"],
@@ -92,7 +92,7 @@ def test_supported_value_types():
 
 
 def test_large_space_is_not_materialised():
-    states = cp.StateSpace(a=range(10**6), b=range(10**6), c=range(10**6))
+    states = cr.StateSpace(a=range(10**6), b=range(10**6), c=range(10**6))
     assert states.size == 10**18
     last = (10**6 - 1, 10**6 - 1, 10**6 - 1)
     assert states.id(last) == 10**18 - 1
@@ -100,21 +100,21 @@ def test_large_space_is_not_materialised():
 
 
 def test_range_with_step():
-    states = cp.StateSpace(t=range(10, 0, -3))  # 10, 7, 4, 1
+    states = cr.StateSpace(t=range(10, 0, -3))  # 10, 7, 4, 1
     assert [states.id((t,)) for t in (10, 7, 4, 1)] == [0, 1, 2, 3]
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         states.id((8,))
 
 
 def test_equality():
-    a = cp.StateSpace(x=[1, 2], y=["p", "q"])
-    assert a == cp.StateSpace(x=[1, 2], y=["p", "q"])
-    assert a != cp.StateSpace(x=[2, 1], y=["p", "q"])
-    assert a != cp.StateSpace(y=["p", "q"], x=[1, 2])
+    a = cr.StateSpace(x=[1, 2], y=["p", "q"])
+    assert a == cr.StateSpace(x=[1, 2], y=["p", "q"])
+    assert a != cr.StateSpace(x=[2, 1], y=["p", "q"])
+    assert a != cr.StateSpace(y=["p", "q"], x=[1, 2])
 
 
 def test_positional_mapping_constructor():
-    states = cp.StateSpace({"class": [1, 2], "id": ["u", "v"]})
+    states = cr.StateSpace({"class": [1, 2], "id": ["u", "v"]})
     assert states.dimension_names == ("class", "id")
     assert states.id({"class": 2, "id": "u"}) == 2
 
@@ -124,37 +124,37 @@ def test_positional_mapping_constructor():
 
 def test_duplicate_values_are_rejected():
     with pytest.raises(ValueError, match="port"):
-        cp.StateSpace(day=range(3), port=["Dubai", "Doha", "Dubai"])
+        cr.StateSpace(day=range(3), port=["Dubai", "Doha", "Dubai"])
     # 1 and 1.0 are the same dictionary key, hence the same state value.
     with pytest.raises(ValueError):
-        cp.StateSpace(level=[1, 1.0])
+        cr.StateSpace(level=[1, 1.0])
 
 
 def test_empty_and_malformed_dimensions_are_rejected():
     with pytest.raises(ValueError):
-        cp.StateSpace()
+        cr.StateSpace()
     with pytest.raises(ValueError):
-        cp.StateSpace(day=[])
+        cr.StateSpace(day=[])
     with pytest.raises(TypeError):
-        cp.StateSpace(port="Dubai")  # a string is not a list of values
+        cr.StateSpace(port="Dubai")  # a string is not a list of values
     with pytest.raises(TypeError):
-        cp.StateSpace(bad=[[1, 2], [3, 4]])  # unhashable values
+        cr.StateSpace(bad=[[1, 2], [3, 4]])  # unhashable values
     with pytest.raises(ValueError):
-        cp.StateSpace(level=[0.0, float("nan")])
+        cr.StateSpace(level=[0.0, float("nan")])
 
 
 def test_unknown_values_are_rejected(vessel_states):
-    with pytest.raises(cp.InvalidStateError, match="port"):
+    with pytest.raises(cr.InvalidStateError, match="port"):
         vessel_states.id((4, "Atlantis", 0.25))
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.id((36, "Dubai", 0.25))
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.id((4, "Dubai", 0.3))
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.id(day=4, port="Dubai")  # inventory missing
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.id(day=4, port="Dubai", inventory=0.25, speed=3)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.id((4, "Dubai"))
     with pytest.raises(TypeError):
         vessel_states.id(86)  # an id is not a state
@@ -169,20 +169,20 @@ def test_invalid_state_error_is_a_value_error(vessel_states):
 
 def test_out_of_range_ids_are_rejected(vessel_states):
     for bad in (-1, 875, 10**9):
-        with pytest.raises(cp.InvalidStateError):
+        with pytest.raises(cr.InvalidStateError):
             vessel_states.decode(bad)
     with pytest.raises(TypeError):
         vessel_states.decode(1.5)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.decode_many([0, 875])
 
 
 def test_vectorised_ids_reject_unknown_values(vessel_states):
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.ids(np.array([1, 99]), "Dubai", 0.0)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.ids(np.array([1, 2]), np.array(["Dubai", "Atlantis"]), 0.0)
-    with pytest.raises(cp.InvalidStateError):
+    with pytest.raises(cr.InvalidStateError):
         vessel_states.ids(np.array([1, 2]), "Dubai", np.array([0.0, 0.3]))
     with pytest.raises(ValueError):
         vessel_states.ids(np.array([1, 2, 3]), np.array(["Dubai", "Mumbai"]), 0.0)

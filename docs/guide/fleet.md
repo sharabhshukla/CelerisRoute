@@ -37,15 +37,15 @@ We remember which edges arrive where.
 ```python
 import numpy as np
 import scipy.sparse as sp
-import celerispath as cp
+import celerisroute as cr
 
 DAYS = range(1, 17)
 PORTS = ["Dubai", "Mumbai", "Singapore"]
 SAILING_DAYS = {("Dubai", "Mumbai"): 3, ("Dubai", "Singapore"): 7, ("Mumbai", "Singapore"): 5}
 
-states = cp.StateSpace(day=DAYS, port=PORTS)
-graph = cp.Graph(states=states)
-graph.add_resource(cp.Resource("fuel", upper=15))
+states = cr.StateSpace(day=DAYS, port=PORTS)
+graph = cr.Graph(states=states)
+graph.add_resource(cr.Resource("fuel", upper=15))
 
 arrivals = {port: [] for port in PORTS}          # edge ids, by port of arrival
 for day in DAYS:
@@ -79,7 +79,7 @@ A = sp.csr_array((np.ones(len(edges)), (rows, edges)), shape=(num_rows, network.
 Now the fleet. Every argument of `add_vessels` takes one value per vessel:
 
 ```python
-fleet = cp.PricingFleet(network, dual_matrix=A)
+fleet = cr.PricingFleet(network, dual_matrix=A)
 fleet.add_vessels(
     ids=names,
     source=[(1, "Dubai"), (1, "Dubai"), (1, "Mumbai")],
@@ -194,14 +194,14 @@ All vessels are priced on native threads with the GIL released, so the speed-up
 is real on any Python build.
 
 ```py
-cp.PricingFleet(network, dual_matrix=A, threads=4)           # default "auto": one per CPU
-cp.PricingFleet(network, dual_matrix=A, scheduler="threads")  # or "tbb", default "auto"
+cr.PricingFleet(network, dual_matrix=A, threads=4)           # default "auto": one per CPU
+cr.PricingFleet(network, dual_matrix=A, scheduler="threads")  # or "tbb", default "auto"
 ```
 
 | scheduler | what it is |
 |---|---|
 | `"threads"` | plain native threads that claim vessels from a shared counter; always available |
-| `"tbb"` | a oneTBB work-stealing arena; only in builds with oneTBB, see `cp.tbb_available()` |
+| `"tbb"` | a oneTBB work-stealing arena; only in builds with oneTBB, see `cr.tbb_available()` |
 
 Both measured the same within noise in the
 [fleet benchmark](../performance.md#fleet-pricing). Results are bit-identical
@@ -215,11 +215,11 @@ edge touches a small fixed number of master rows, known by index, you can skip
 the sparse matrix entirely:
 
 ```py
-mapping = cp.IndexedDuals(row=row_of_edge, coefficient=1.0)       # -1 means "no row"
-fleet = cp.PricingFleet(network, dual_mapping=mapping)
+mapping = cr.IndexedDuals(row=row_of_edge, coefficient=1.0)       # -1 means "no row"
+fleet = cr.PricingFleet(network, dual_mapping=mapping)
 ```
 
-`cp.PortTimeProductDuals` is the same idea for the common case of master rows
+`cr.PortTimeProductDuals` is the same idea for the common case of master rows
 indexed by `(port, day, product)`; a dual array of that shape can then be
 passed to `fleet.price` as it is.
 

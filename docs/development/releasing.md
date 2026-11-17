@@ -5,7 +5,7 @@ machine.
 
 ## What gets built
 
-The [Wheels workflow](https://github.com/sharabhshukla/CelerisPath/actions/workflows/wheels.yml)
+The [Wheels workflow](https://github.com/sharabhshukla/CelerisRoute/actions/workflows/wheels.yml)
 uses [cibuildwheel](https://cibuildwheel.pypa.io/) to build one wheel per
 platform and Python version, and runs the full test suite against every wheel
 before it is kept.
@@ -35,8 +35,8 @@ uploads the wheels and the source distribution to PyPI.
 !!! note "One-time setup for PyPI"
     The upload uses [trusted publishing](https://docs.pypi.org/trusted-publishers/),
     so no token is stored in the repository. It has to be enabled once on PyPI:
-    add a trusted publisher for the project `celerispath` with owner
-    `sharabhshukla`, repository `CelerisPath`, workflow `wheels.yml` and
+    add a trusted publisher for the project `celerisroute` with owner
+    `sharabhshukla`, repository `CelerisRoute`, workflow `wheels.yml` and
     environment `pypi`. Until that is done, the publish job fails and nothing
     is uploaded.
 

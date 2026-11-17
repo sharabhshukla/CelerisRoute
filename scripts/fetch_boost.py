@@ -1,6 +1,6 @@
-"""Download the Boost headers that celerispath needs to compile.
+"""Download the Boost headers that celerisroute needs to compile.
 
-celerispath uses only header-only parts of Boost (Boost.Graph and what it
+celerisroute uses only header-only parts of Boost (Boost.Graph and what it
 includes), so nothing has to be built. This script downloads one pinned Boost
 release, checks its SHA-256 and unpacks the ``boost/`` header directory:
 

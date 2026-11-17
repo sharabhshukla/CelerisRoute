@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "celerispath/label_pool.hpp"
-#include "celerispath/types.hpp"
+#include "celerisroute/label_pool.hpp"
+#include "celerisroute/types.hpp"
 
-namespace celerispath {
+namespace celerisroute {
 
 // Label memory is kept between solves so repeated pricing does not return to
 // the system allocator for every label.
@@ -64,4 +64,4 @@ PathResult solve_rcsp(const Csr& csr, const RcspData& resources, const double* s
                       RcspWorkspace& workspace, SolveStats& stats, const double* to_go,
                       const double* upper = nullptr, const StopToken* stop = nullptr);
 
-}  // namespace celerispath
+}  // namespace celerisroute

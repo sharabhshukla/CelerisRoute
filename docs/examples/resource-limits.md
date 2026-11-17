@@ -41,4 +41,4 @@ with only 28 hours: infeasible
 The guide page [Resource limits](../guide/resources.md) explains how the
 search works and what makes it expensive.
 
-[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/resource_limits.py){ .md-button }
+[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisRoute/blob/main/examples/resource_limits.py){ .md-button }

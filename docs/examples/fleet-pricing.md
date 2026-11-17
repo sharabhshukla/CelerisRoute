@@ -80,4 +80,4 @@ oneTBB and `threads` on the published wheels.
 See [Fleet pricing](../guide/fleet.md) in the guide for everything a vessel
 profile can hold.
 
-[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/fleet_pricing.py){ .md-button }
+[:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisRoute/blob/main/examples/fleet_pricing.py){ .md-button }
