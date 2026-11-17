@@ -71,4 +71,8 @@ Aurora: cost 283, 24 days at sea
 The master cost falls as better routes arrive and the last round finds none,
 which certifies the LP optimum. The integer plan has the same value.
 
+The LP optimum of 1061 is the same on every machine. The rounds in between
+can differ with the SciPy version, because an LP usually has several optimal
+dual solutions and the solver may return any of them.
+
 [:octicons-mark-github-16: View on GitHub](https://github.com/sharabhshukla/CelerisPath/blob/main/examples/column_generation.py){ .md-button }

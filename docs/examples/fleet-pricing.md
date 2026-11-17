@@ -72,7 +72,9 @@ vessel 01 from Dubai     cost  233, 14 of 14 days at sea, delivers to Singapore 
 ```
 
 The pricing column is the wall time of one `fleet.price` call for all twelve
-vessels and varies from run to run. The scheduler reads `tbb` on a build with
+vessels and varies from run to run. The LP optimum of 4637 is the same on
+every machine; the number of rounds and routes on the way there depends on
+which optimal duals the LP solver returns. The scheduler reads `tbb` on a build with
 oneTBB and `threads` on the published wheels.
 
 See [Fleet pricing](../guide/fleet.md) in the guide for everything a vessel

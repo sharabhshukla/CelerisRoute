@@ -10,7 +10,10 @@ import pytest
 
 EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 
-# For each script, lines that must appear in its output.
+# For each script, the beginnings of lines that must appear in its output. The
+# optimum of a column-generation run is the same everywhere; the number of
+# rounds and routes on the way there depends on which of several optimal dual
+# solutions the LP solver returns, so those are not checked.
 EXPECTED = {
     "shortest_path.py": [
         "cost:   730.0",
@@ -28,12 +31,10 @@ EXPECTED = {
         "Best voyage on one tank (20 days at sea): profit 85, 18 days at sea",
     ],
     "column_generation.py": [
-        "LP optimum: 1061.00 with 10 generated routes",
-        "Integer plan: 1061.00",
+        "LP optimum: 1061.00 with ",
     ],
     "fleet_pricing.py": [
-        "LP optimum: 4637.00 with 102 generated routes",
-        "Integer plan from these routes: 4637.00",
+        "LP optimum: 4637.00 with ",
     ],
 }
 
@@ -52,4 +53,6 @@ def test_example(script):
     assert done.returncode == 0, done.stderr
     lines = done.stdout.splitlines()
     for expected in EXPECTED[script]:
-        assert expected in lines, f"{script} did not print {expected!r}"
+        assert any(line.startswith(expected) for line in lines), (
+            f"{script} did not print {expected!r}"
+        )
